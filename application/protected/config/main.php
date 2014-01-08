@@ -1,76 +1,79 @@
 <?php
 
-// uncomment the following to define a path alias
-// Yii::setPathOfAlias('local','path/to/local-folder');
+date_default_timezone_set('@@TIMEZONE@@');
+mb_internal_encoding("UTF-8");
 
-// This is the main Web application configuration. Any writable
-// CWebApplication properties can be configured here.
+// add real time logging
+Yii::getLogger()->autoDump = 1;
+Yii::getLogger()->autoFlush = 1;
+
+
+
 return array(
-	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'Yii Blog Demo',
+    'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
+    'name' => '@@NAME@@',
+    
+    'sourceLanguage' => 'en', 
+    'language' => 'en',
+        
+    // preloading 'log' component
+    'preload' => array('log'),
+    // autoloading model and component classes
+    'import' => array(
+        'application.components.*',
+        'application.helpers.*',
+    ),
+    'modules' => array(
+    ),
+    // application components
+    'components' => array(
+        
+        'user' => array(
+            // enable cookie-based authentication
+            'allowAutoLogin' => true,
+        ),
+        // uncomment the following to enable URLs in path-format
+        'urlManager' => array(
+            'urlFormat' => 'path',
+            'rules' => array(
+                '<controller:\w+>/<id:\d+>' => '<controller>/view',
+                '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
+            ),
+            'showScriptName' => false,
+        ),
 
-	// preloading 'log' component
-	'preload'=>array('log'),
-
-	// autoloading model and component classes
-	'import'=>array(
-		'application.models.*',
-		'application.components.*',
-	),
-
-	'defaultController'=>'post',
-
-	// application components
-	'components'=>array(
-		'user'=>array(
-			// enable cookie-based authentication
-			'allowAutoLogin'=>true,
-		),
-		'db'=>array(
-			'connectionString' => 'sqlite:protected/data/blog.db',
-			'tablePrefix' => 'tbl_',
-		),
-		// uncomment the following to use a MySQL database
-		/*
-		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=blog',
-			'emulatePrepare' => true,
-			'username' => 'root',
-			'password' => '',
-			'charset' => 'utf8',
-			'tablePrefix' => 'tbl_',
-		),
-		*/
-		'errorHandler'=>array(
-			// use 'site/error' action to display errors
-			'errorAction'=>'site/error',
-		),
-		'urlManager'=>array(
-			'urlFormat'=>'path',
-			'rules'=>array(
-				'post/<id:\d+>/<title:.*?>'=>'post/view',
-				'posts/<tag:.*?>'=>'post/index',
-				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
-			),
-		),
-		'log'=>array(
-			'class'=>'CLogRouter',
-			'routes'=>array(
-				array(
-					'class'=>'CFileLogRoute',
-					'levels'=>'error, warning',
-				),
-				// uncomment the following to show log messages on web pages
-				/*
-				array(
-					'class'=>'CWebLogRoute',
-				),
-				*/
-			),
-		),
-	),
-
-	// application-level parameters that can be accessed
-	// using Yii::app()->params['paramName']
-	'params'=>require(dirname(__FILE__).'/params.php'),
+        'db' => array(
+            'class' => 'application.extensions.ymds.EMongoDB',
+            'connectionString' => 'mongodb://@@MONGO_HOST@@/@@MONGO_DB@@',
+            'dbName' => '@@MONGO_DB@@',
+            'fsyncFlag' => false,
+            'safeFlag' => false,
+            'useCursor' => false,
+            'cacheId' => 'cache',
+        ),
+                
+        'log' => array(
+            'class' => 'CLogRouter',
+            'routes' => array(
+                array(
+                    'class' => 'application.extensions.GrayLogRoute.DGGrayLogRoute',
+                    'enabled' => false,
+                    'levels'  => 'error, warning, trace, info',
+                    'host' => '@@GRAYLOG_HOST@@',
+                    'port' => '@@GRAYLOG_PORT@@',
+                    'apphost' => '@@URL@@',
+                ),
+                array(
+                    'class' => 'application.extensions.PRFLR.PRFLRLogRoute',
+                    'enabled' => false,
+                    'levels'  => 'profile',
+                    'host'   => '@@PROFILER_HOST@@',
+                    'source' => '@@URL@@',
+                ),
+            ),
+        ),        
+    ),
+    // application-level parameters that can be accessed
+    // using Yii::app()->params['paramName']
+    'params' => require(dirname(__FILE__) . '/params.php'), 
 );
