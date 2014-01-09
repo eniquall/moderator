@@ -1,6 +1,6 @@
 <?php
 
-date_default_timezone_set('@@TIMEZONE@@');
+//date_default_timezone_set('@@TIMEZONE@@');
 mb_internal_encoding("UTF-8");
 
 // add real time logging
