@@ -10,23 +10,39 @@ class ModeratorForm extends CFormModel {
 	public $email;
 	public $password;
 	public $password2;
-	public $languages;
+	public $langs;
 	public $paypal;
+	public $_id;
+
+	public function init() {
+		$scenario = empty($_id) ? "registration" : "edit";
+		$this->setScenario($scenario);
+	}
 
 	public function rules() {
 		return array(
 			array('name, email, password, password2, paypal', 'required'),
+			array('_id', 'required', 'on' => 'edit'),
 			array('name', 'length', 'min' => 2),
 			array('email', 'email', 'allowEmpty' => false),
-			array('email', 'unique', 'className' => 'Moderator'),
+			array('email', 'uniqueEmail'),
 			array('password', 'length', 'min' => 6),
 			array('password2', 'compare', 'compareAttribute' => 'password'),
 			//array('languages', 'in', 'strict' => true, 'range' => array_keys(LanguagesHelper::$allowedLanguagesList()), 'message' => 'Choose one or more languages from the list'),
-			array('languages','type','type'=>'array','allowEmpty' => false, 'message' => 'Choose at least one language from the list'),
-			array('languages', 'LanguageAllowed', 'message' => 'One of the languages is not allowed'),
+			array('langs','type','type'=>'array','allowEmpty' => false, 'message' => 'Choose at least one language from the list'),
+			array('langs', 'LanguageAllowed', 'message' => 'One of the languages is not allowed'),
+
 		);
 	}
 
+	public function uniqueEmail($attribute, $params) {
+		$email = $this->attributes[$attribute];
+
+		// check email for new moderator
+		if (!ModeratorHelper::isEmailUnique($email, true)) {
+			$this->addError($attribute, 'Email ' . $email . ' already exists');
+		}
+	}
 	public function attributeLabels() {
 		return array(
 			'name'=>'Your name',

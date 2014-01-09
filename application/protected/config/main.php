@@ -22,6 +22,7 @@ return array(
     'import' => array(
         'application.components.*',
         'application.helpers.*',
+	    'ext.ymds.*'
     ),
     'modules' => array(
     ),
@@ -43,9 +44,9 @@ return array(
         ),
 
         'db' => array(
-            'class' => 'application.extensions.ymds.EMongoDB',
-            'connectionString' => 'mongodb://@@MONGO_HOST@@/@@MONGO_DB@@',
-            'dbName' => '@@MONGO_DB@@',
+            'class' => 'ext.ymds.EMongoDB',
+            'connectionString' => 'mongodb://localhost/moderator',
+            'dbName' => 'moderator',
             'fsyncFlag' => false,
             'safeFlag' => false,
             'useCursor' => false,

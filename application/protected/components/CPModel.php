@@ -18,7 +18,7 @@ abstract class CPModel extends EMongoDocument
             foreach ($this->getErrors() as $error) {
                 $msg[] = reset($error);
             }
-            throw new ApiException(implode('; ', $msg), ApiException::UNKNOWN);
+            throw new CException(implode('; ', $msg));
         }
 
         return true;

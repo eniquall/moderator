@@ -33,9 +33,15 @@
 		</div>
 
 		<div class="row">
-			<?= $form->label($model, 'languages', array('label' => $model->getAttributeLabel("languages"))); ?>
-			<?= $form->checkBoxList($model, 'languages', LanguagesHelper::getAllowedLanguagesList()); ?>
-			<?= $form->error($model, 'languages'); ?>
+			<?= $form->label($model, 'langs', array('label' => $model->getAttributeLabel("langs"))); ?>
+			<?= $form->checkBoxList($model, 'langs', LanguagesHelper::getAllowedLanguagesList()); ?>
+			<?= $form->error($model, 'langs'); ?>
+		</div>
+
+		<div class="row">
+			<?= $form->label($model, 'paypal', array('label' => $model->getAttributeLabel("paypal"))); ?>
+			<?= $form->textField($model, 'paypal', array('class' => 'shortField')); ?>
+			<?= $form->error($model, 'paypal'); ?>
 		</div>
 
 		<div class="row">
