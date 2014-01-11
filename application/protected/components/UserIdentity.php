@@ -65,16 +65,4 @@ class UserIdentity extends CUserIdentity
 	public function getRole() {
 		return $this->role;
 	}
-
-	/**
-	 * Methods return model of the current user
-	 * @return null|Moderator
-	 */
-	public function getModel() {
-		if (Yii::app()->user->isGuest) {
-			return null;
-		}
-
-		return Moderator::model()->findByPk($this->_id);
-	}
 }

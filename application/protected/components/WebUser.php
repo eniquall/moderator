@@ -8,11 +8,10 @@
  */
 
 class WebUser extends CWebUser {
-	public $role;
-
 	public function login($identity,$duration=0) {
-		$this->role = $identity->getRole();
-		$result = parent::login($identity,$duration=0);
+		$this->setState('role', $identity->getRole());
+		//$this->role = $identity->getRole();
+		$result = parent::login($identity, $duration=0);
 
 //		if ($result) {
 //			$this->role = $identity->getRole();
@@ -34,7 +33,7 @@ class WebUser extends CWebUser {
 			return false;
 		}
 
-		return $this->role == UserIdentity::PROJECT_ROLE;
+		return $this->getState('role') == UserIdentity::PROJECT_ROLE;
 	}
 
 	public function isModerator() {
@@ -42,6 +41,21 @@ class WebUser extends CWebUser {
 			return false;
 		}
 
-		return $this->role == UserIdentity::MODERATOR_ROLE;
+		return $this->getState('role') == UserIdentity::MODERATOR_ROLE;
+	}
+
+	/**
+	 * Methods return model of the current user
+	 * @return null|Moderator
+	 */
+	public function getModel() {
+		if (Yii::app()->user->isGuest) {
+			return null;
+		}
+
+		// can be Moderator or Project
+		$modelClassName = $this->getState('role');
+		$model = $modelClassName::model()->findByPk(new MongoID($this->getId()));
+		return $model;
 	}
 }

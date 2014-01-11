@@ -96,8 +96,9 @@ class ModeratorForm extends CFormModel {
 	public function populateFromModel(Moderator $model) {
 		$this->name = $model->name;
 		$this->email = $model->email;
-		$this->langs = $model->paypal;
-		$this->_id = $model->id;
+		$this->langs = $model->langs;
+		$this->paypal = $model->paypal;
+		$this->_id = $model->_id;
 		$this->setScenario(self::EDIT_PROFILE_SCENARIO);
 	}
 
