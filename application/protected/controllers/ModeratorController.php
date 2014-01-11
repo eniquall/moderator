@@ -6,6 +6,7 @@
  */
 
 Yii::import('application.models.forms.ModeratorForm');
+Yii::import('application.models.forms.LoginForm');
 Yii::import('application.models.Moderator');
 class ModeratorController extends Controller {
 
@@ -16,7 +17,7 @@ class ModeratorController extends Controller {
 			if ($model->validate()) {
 				// register
 
-				if ($this->registerModerator($model)) {
+				if ($this->_registerModerator($model)) {
 					$this->redirect('/moderator/moderate');
 				}
 			}
@@ -24,12 +25,43 @@ class ModeratorController extends Controller {
 		$this->render('registration', array('model' => $model));
 	}
 
+	public function actionLogin() {
+		$model = new LoginForm();
+		if (isset($_POST['LoginForm'])) {
+			$model->attributes = $_POST['LoginForm'];
+			if ($model->validate() && $model->login()) {
+				$returnUrl = !empty(Yii::app()->user->returnUrl)
+					? Yii::app()->user->returnUrl
+					: $this->createUrl('/moderator/moderate');
+				$this->redirect($returnUrl);
+			}
+		}
+
+		$this->render('login', array('model' => $model));
+	}
+
+	/**
+	 * Logs out the current user and redirect to homepage.
+	 */
+	public function actionLogout()
+	{
+		Yii::app()->user->logout();
+		$this->redirect(Yii::app()->homeUrl);
+	}
+
+	/**
+	 * Edit profile of the current moderator
+	 */
 	public function actionEditProfile() {
-		//$this->render('edit');
+		$formModel = new ModeratorForm();
+		$moderator = Yii::app()->user->getModel();
+		$formModel->populateFromModel($moderator);
+
+		$this->render('editProfile');
 	}
 
 
-	private function registerModerator(ModeratorForm $formModel) {
+	private function _registerModerator(ModeratorForm $formModel) {
 		$moderator = new Moderator();
 		$moderator->name  = $formModel->name;
 		$moderator->email = $formModel->email;

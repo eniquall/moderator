@@ -59,7 +59,6 @@ class Moderator extends CPModel {
 		return array(
 			array('name, email, password, langs, paypal', 'required'),
 			array('email', 'uniqueEmail'),
-			array('name', 'url'),
 			array('isActive, isSuperModerator', 'in', 'range' => [0,1]),
 		);
 	}	
@@ -84,5 +83,9 @@ class Moderator extends CPModel {
 		if ($this->count($criteria) ) {
 			$this->addError($attribute, 'Email ' . $email . ' already exists');
 		}
+	}
+
+	public function validatePassword($password) {
+		return md5($password) === $this->password;
 	}
 }

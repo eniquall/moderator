@@ -28,11 +28,15 @@
 	<div id="mainmenu">
 		<?php $this->widget('zii.widgets.CMenu',array(
 			'items'=>array(
-				array('label'=>'Home', 'url'=>array('post/index')),
-				array('label'=>'About', 'url'=>array('site/page', 'view'=>'about')),
-				array('label'=>'Contact', 'url'=>array('site/contact')),
-				array('label'=>'Login', 'url'=>array('site/login'), 'visible'=>Yii::app()->user->isGuest),
-				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('site/logout'), 'visible'=>!Yii::app()->user->isGuest)
+				array('label'=>'Home', 'url'=>array('')),
+				array('label'=>'About', 'url'=>array('/static/about')),
+				array('label'=>'Login for moderator', 'url'=>array('/moderator/login'), 'visible'=>Yii::app()->user->isGuest),
+				array('label'=>'Edit moderator profile', 'url'=>array('/moderator/editProfile'), 'visible'=>Yii::app()->user->isModerator()),
+
+				array('label'=>'Login for project', 'url'=>array('/project/login'), 'visible'=>Yii::app()->user->isGuest),
+				array('label'=>'Edit project profile', 'url'=>array('/project/editProfile'), 'visible'=>Yii::app()->user->isProject()),
+
+				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/moderator/logout'), 'visible'=>!Yii::app()->user->isGuest)
 			),
 		)); ?>
 	</div><!-- mainmenu -->
@@ -43,6 +47,13 @@
 
 	<?php echo $content; ?>
 
+	<?php
+		if (Yii::app()->user->isGuest) {
+			echo "guest";
+		} else {
+			echo Yii::app()->user->name . " " . Yii::app()->user->getId() . " " ;
+		}
+	?>
 	<div id="footer">
 		Copyright &copy; <?php echo date('Y'); ?> by My Company.<br/>
 		All Rights Reserved.<br/>

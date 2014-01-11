@@ -1,6 +1,5 @@
 <?php
 /**
- * User: eniquall
  * Date: 1/8/14
  * Time: 11:37 PM
  */
@@ -10,28 +9,46 @@ class ModeratorForm extends CFormModel {
 	public $email;
 	public $password;
 	public $password2;
+
+	public $newPassword;
+	public $newPassword2;
+
 	public $langs;
 	public $paypal;
 	public $_id;
 
+	const REGISTRATION_SCENARIO = 'registration';
+	const EDIT_PROFILE_SCENARIO = 'edit';
+
 	public function init() {
-		$scenario = empty($_id) ? "registration" : "edit";
-		$this->setScenario($scenario);
+		// dafault scenario - registration
+		$this->setScenario(self::REGISTRATION_SCENARIO);
 	}
 
 	public function rules() {
 		return array(
-			array('name, email, password, password2, paypal', 'required'),
+			array('name, email, paypal', 'required'),
+			array('password', 'required', 'on' => self::REGISTRATION_SCENARIO),
+
 			array('_id', 'required', 'on' => 'edit'),
 			array('name', 'length', 'min' => 2),
 			array('email', 'email', 'allowEmpty' => false),
 			array('email', 'uniqueEmail'),
 			array('password', 'length', 'min' => 6),
-			array('password2', 'compare', 'compareAttribute' => 'password'),
-			//array('languages', 'in', 'strict' => true, 'range' => array_keys(LanguagesHelper::$allowedLanguagesList()), 'message' => 'Choose one or more languages from the list'),
+
+			array('password', 'checkForNewPassword', 'on' => self::EDIT_PROFILE_SCENARIO),
+
+			//array('password2', 'required', 'on' => self::REGISTRATION_SCENARIO),
+			array('password2', 'compare', 'compareAttribute' => 'password', 'on' => self::REGISTRATION_SCENARIO),
+
+			//array('newPassword', 'required', 'on' => self::EDIT_PROFILE_SCENARIO),
+			array('newPassword', 'length', 'min' => 6, 'on' => self::EDIT_PROFILE_SCENARIO),
+
+			//array('newPassword2', 'required', 'on' => self::EDIT_PROFILE_SCENARIO),
+			array('newPassword2', 'compare', 'compareAttribute' => 'newPassword', 'on' => self::EDIT_PROFILE_SCENARIO),
+
 			array('langs','type','type'=>'array','allowEmpty' => false, 'message' => 'Choose at least one language from the list'),
 			array('langs', 'LanguageAllowed', 'message' => 'One of the languages is not allowed'),
-
 		);
 	}
 
@@ -74,6 +91,28 @@ class ModeratorForm extends CFormModel {
 			}
 		}
 		return true;
+	}
+
+	public function populateFromModel(Moderator $model) {
+		$this->name = $model->name;
+		$this->email = $model->email;
+		$this->langs = $model->paypal;
+		$this->_id = $model->id;
+		$this->setScenario(self::EDIT_PROFILE_SCENARIO);
+	}
+
+
+	public function checkForNewPassword($attribute, $params) {
+		$password = $this->attributes[$attribute];
+		$newPassword = $this->attributes['newPassword'];
+
+		//if user entered new password - check if he entered correct current password
+		if (!empty($newPassword)) {
+			$userModel = Yii::app()->user->getModel();
+			if (!$userModel->verifyPassword($password)) {
+				$this->addError($attribute, 'Current correct password should be entered');
+			}
+		}
 	}
 
 }
