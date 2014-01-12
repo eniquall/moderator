@@ -20,11 +20,6 @@ class ModeratorForm extends CFormModel {
 	const REGISTRATION_SCENARIO = 'registration';
 	const EDIT_PROFILE_SCENARIO = 'edit';
 
-	public function init() {
-		// dafault scenario - registration
-		$this->setScenario(self::REGISTRATION_SCENARIO);
-	}
-
 	public function rules() {
 		return array(
 			array('name, email, paypal', 'required'),
@@ -33,18 +28,13 @@ class ModeratorForm extends CFormModel {
 			array('_id', 'required', 'on' => 'edit'),
 			array('name', 'length', 'min' => 2),
 			array('email', 'email', 'allowEmpty' => false),
-			array('email', 'uniqueEmail'),
+			array('email', 'uniqueEmail', 'on' => self::REGISTRATION_SCENARIO),
 			array('password', 'length', 'min' => 6),
 
 			array('password', 'checkForNewPassword', 'on' => self::EDIT_PROFILE_SCENARIO),
-
-			//array('password2', 'required', 'on' => self::REGISTRATION_SCENARIO),
 			array('password2', 'compare', 'compareAttribute' => 'password', 'on' => self::REGISTRATION_SCENARIO),
 
-			//array('newPassword', 'required', 'on' => self::EDIT_PROFILE_SCENARIO),
 			array('newPassword', 'length', 'min' => 6, 'on' => self::EDIT_PROFILE_SCENARIO),
-
-			//array('newPassword2', 'required', 'on' => self::EDIT_PROFILE_SCENARIO),
 			array('newPassword2', 'compare', 'compareAttribute' => 'newPassword', 'on' => self::EDIT_PROFILE_SCENARIO),
 
 			array('langs','type','type'=>'array','allowEmpty' => false, 'message' => 'Choose at least one language from the list'),
@@ -99,7 +89,6 @@ class ModeratorForm extends CFormModel {
 		$this->langs = $model->langs;
 		$this->paypal = $model->paypal;
 		$this->_id = $model->_id;
-		$this->setScenario(self::EDIT_PROFILE_SCENARIO);
 	}
 
 
@@ -110,8 +99,10 @@ class ModeratorForm extends CFormModel {
 		//if user entered new password - check if he entered correct current password
 		if (!empty($newPassword)) {
 			$userModel = Yii::app()->user->getModel();
-			if (!$userModel->verifyPassword($password)) {
+			if (!$userModel->validatePassword($password)) {
 				$this->addError($attribute, 'Current correct password should be entered');
+			} else {
+				Yii::app()->user->setFlash('success', 'Password changed sucessfully');
 			}
 		}
 	}

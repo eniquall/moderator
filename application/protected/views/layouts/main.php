@@ -30,6 +30,7 @@
 			'items'=>array(
 				array('label'=>'Home', 'url'=>array('')),
 				array('label'=>'About', 'url'=>array('/static/about')),
+				array('label'=>'Registration for moderator', 'url'=>array('/moderator/registration'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Login for moderator', 'url'=>array('/moderator/login'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Edit moderator profile', 'url'=>array('/moderator/editProfile'), 'visible'=>Yii::app()->user->isModerator()),
 
@@ -40,6 +41,14 @@
 			),
 		)); ?>
 	</div><!-- mainmenu -->
+
+	<?php if (Yii::app()->user->hasFlash('success')) {
+		foreach ((array)Yii::app()->user->getFlash('success') as $message) { ?>
+			<div class="flash-success">
+				<?php echo $message; ?>
+			</div>
+		<? }
+	} ?>
 
 	<?php $this->widget('zii.widgets.CBreadcrumbs', array(
 		'links'=>$this->breadcrumbs,

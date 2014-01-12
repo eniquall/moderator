@@ -11,12 +11,10 @@ Yii::import('application.models.Moderator');
 class ModeratorController extends Controller {
 
 	public function actionRegistration() {
-		$model = new ModeratorForm();
+		$model = new ModeratorForm(ModeratorForm::REGISTRATION_SCENARIO);
 		if (isset($_POST['ModeratorForm'])) {
 			$model->attributes = $_POST['ModeratorForm'];
 			if ($model->validate()) {
-				// register
-
 				if ($this->_saveModeratorProfile($model)) {
 					$this->redirect('/moderator/moderate');
 				}
@@ -53,17 +51,15 @@ class ModeratorController extends Controller {
 	 * Edit profile of the current moderator
 	 */
 	public function actionEditProfile() {
-		$formModel = new ModeratorForm();
+		$formModel = new ModeratorForm(ModeratorForm::EDIT_PROFILE_SCENARIO);
 
 		if (isset($_POST['ModeratorForm'])) {
-//			var_dump($_POST['ModeratorForm']);
-//			die();
 
-			$model->attributes = $_POST['ModeratorForm'];
-			if ($model->validate()) {
+			$formModel->attributes = $_POST['ModeratorForm'];
+			if ($formModel->validate()) {
 				// register
 
-				if ($this->_saveModeratorProfile($model)) {
+				if ($this->_saveModeratorProfile($formModel)) {
 					$this->redirect('/moderator/moderate');
 				}
 			}
@@ -75,66 +71,37 @@ class ModeratorController extends Controller {
 		$this->render('editProfile', array('model' => $formModel));
 	}
 
-//
-//	private function _registerModerator(ModeratorForm $formModel) {
-//		$moderator = new Moderator();
-//		$moderator->name  = $formModel->name;
-//		$moderator->email = $formModel->email;
-//
-//		// save md5 hash of password
-//		$moderator->password  = md5($formModel->password);
-//		$moderator->langs  = $formModel->langs;
-//		$moderator->paypal = $formModel->paypal;
-//
-//		$result = $moderator->save();
-//		if (!$result) {
-//			Yii::log(__CLASS__ . " " . __METHOD__ .  "Can't register user: " . CJSON::encode($moderator->getErrors()));
-//		};
-//
-//		return $result;
-//	}
-
-	public function _saveModeratorProfile(MoeratorForm $formModel) {
+	public function _saveModeratorProfile(ModeratorForm $formModel) {
 		$moderator = null;
-		$scenario = null;
-		// choose scenario
-		if (!empty($formModel->_id)) {
-			// edit current profile
-			$scenario = ModeratorForm::EDIT_PROFILE_SCENARIO;
+		if ($formModel->getScenario() == ModeratorForm::EDIT_PROFILE_SCENARIO) {
 			if (Yii::app()->user->getId() != $formModel->_id) {
 				throw new CHttpException(403, "You are trying to edit profile, but not loggged in");
 			} else {
 				$moderator = Yii::app()->user->getModel();
+				// save new password if it was entered
+				// additional validations were performed with ModeratorForm validations (checkForNewPassword)
+				if (!empty($formModel->newPassword)) {
+					$moderator->password = md5($formModel->newPassword);
+				}
 			}
-		} else {
-			// registration new profile
-			$scenario = ModeratorForm::REGISTRATION_SCENARIO;
+		} else if ($formModel->getScenario() == ModeratorForm::REGISTRATION_SCENARIO){
 			$moderator = new Moderator();
+			// save md5 hash of password
+			$moderator->password = md5($formModel->password);
 		}
 
-		// password!
-
 		$moderator->name  = $formModel->name;
-		$moderator->email = $formModel->email;
+		$moderator->email = mb_strtolower($formModel->email);
 
 		$moderator->langs  = $formModel->langs;
 		$moderator->paypal = $formModel->paypal;
-
-		if ($scenario == ModeratorForm::REGISTRATION_SCENARIO) {
-			// save md5 hash of password
-			$moderator->password = md5($formModel->password);
-		} else if ($scenario == ModeratorForm::EDIT_PROFILE_SCENARIO){
-			//save new password if it was entered
-			// additional validations were performed with oderatorForm validations (checkForNewPassword)
-			if (!empty($formModel->newPassword)) {
-				$moderator->password = md5($formModel->newPassword);
-			}
-		}
 
 
 		$result = $moderator->save();
 		if (!$result) {
 			Yii::log(__CLASS__ . " " . __METHOD__ .  "Can't save moderator profile (scenario: " . $scenario . "): " . CJSON::encode($moderator->getErrors()));
+		} else {
+			Yii::app()->user->setFlash('success', 'Profile successfully saved');
 		};
 
 		return $result;

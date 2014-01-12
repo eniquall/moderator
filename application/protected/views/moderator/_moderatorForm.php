@@ -12,6 +12,11 @@
 		),
 	));
 	?>
+<?php if ($model->getScenario() == ModeratorForm::EDIT_PROFILE_SCENARIO) {?>
+	<div class="row">
+		<?= $form->hiddenField($model, '_id'); ?>
+	</div>
+<? } ?>
 	<div class="row">
 		<?= $form->label($model, 'name', array('label' => $model->getAttributeLabel("name"))); ?>
 		<?= $form->textField($model, 'name', array('class' => 'longField')); ?>
@@ -63,7 +68,7 @@
 	</div>
 
 	<div class="row">
-		<input type="submit" value="Register">
+		<input type="submit" value="<?= $model->getScenario() == ModeratorForm::REGISTRATION_SCENARIO ? "Register" : "Edit"; ?>">
 	</div>
 	<?php $this->endWidget(); ?>
 </div>
