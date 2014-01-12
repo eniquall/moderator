@@ -12,10 +12,10 @@ Yii::getLogger()->autoFlush = 1;
 return array(
 	'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
 	'name' => '@@NAME@@',
-	
-	'sourceLanguage' => 'en', 
+
+	'sourceLanguage' => 'en',
 	'language' => 'en',
-		
+
 	// preloading 'log' component
 	'preload' => array('log'),
 	// autoloading model and component classes
@@ -27,10 +27,15 @@ return array(
 		'ext.ymds.*'
 	),
 	'modules' => array(
+		'gii' => array(
+			'class' => 'system.gii.GiiModule',
+			'password' => '124',
+			// If removed, Gii defaults to localhost only. Edit carefully to taste.
+			'ipFilters' => array('127.0.0.1', '::1'),
+		),
 	),
 	// application components
 	'components' => array(
-		
 		'user' => array(
 			// enable cookie-based authentication
 			'class' => 'WebUser',
@@ -44,8 +49,7 @@ return array(
 			),
 			'showScriptName' => false,
 		),
-
-		'db' => array(
+		'mongodb' => array(
 			'class' => 'ext.ymds.EMongoDB',
 			'connectionString' => 'mongodb://localhost/moderator',
 			'dbName' => 'moderator',
@@ -54,7 +58,13 @@ return array(
 			'useCursor' => false,
 			'cacheId' => 'cache',
 		),
-				
+		'db' => array(
+			'connectionString' => 'mysql:host=127.0.0.1;dbname=moderator',
+			'username' => 'root',
+			'password' => '',
+			'schemaCachingDuration' => 0,
+			'enableProfiling' => true,
+		),
 		'log' => array(
 			'class' => 'CLogRouter',
 			'routes' => array(
@@ -74,9 +84,9 @@ return array(
 					'source' => '@@URL@@',
 				),
 			),
-		),		
+		),
 	),
 	// application-level parameters that can be accessed
 	// using Yii::app()->params['paramName']
-	'params' => require(dirname(__FILE__) . '/params.php'), 
+	'params' => require(dirname(__FILE__) . '/params.php'),
 );

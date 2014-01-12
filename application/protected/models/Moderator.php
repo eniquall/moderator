@@ -1,5 +1,6 @@
 <?php
 class Moderator extends CPModel {
+	public $_id;
 	public $name;
 	public $email;
 	public $password;
@@ -27,12 +28,14 @@ class Moderator extends CPModel {
 	{
 		return array('name' => 'moderator');
 	}
-	
-	public function getMongoDBComponent()
+
+	/**
+	 * returns the primary key field for this model
+	 */
+	public function primaryKey()
 	{
-		return Yii::app()->getComponent('db');
+		return '_id';
 	}
-	
 	
 	public function indexes()
 	{
