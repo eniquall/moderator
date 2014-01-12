@@ -1,32 +1,31 @@
 <?php
 /**
- * Date: 1/8/14
- * Time: 11:37 PM
+ * User: dna
+ * Date: 1/12/14
+ * Time: 5:23 PM
  */
 
-class ModeratorForm extends CFormModel {
-	public $name;
+class ProjectForm extends CFormModel {
+	public $_id;
+	public $project;
 	public $email;
+	public $name;
 	public $password;
 	public $password2;
 
 	public $newPassword;
 	public $newPassword2;
 
-	public $langs;
-	public $paypal;
-	public $_id;
-
 	const REGISTRATION_SCENARIO = 'registration';
 	const EDIT_PROFILE_SCENARIO = 'edit';
 
 	public function rules() {
 		return array(
-			array('name, email, paypal', 'required'),
+			array('name, email, project', 'required'),
 			array('password', 'required', 'on' => self::REGISTRATION_SCENARIO),
 
 			array('_id', 'required', 'on' => 'edit'),
-			array('name', 'length', 'min' => 2),
+			array('name, project', 'length', 'min' => 2),
 			array('email', 'email', 'allowEmpty' => false),
 			array('email', 'uniqueEmail', 'on' => self::REGISTRATION_SCENARIO),
 			array('password', 'length', 'min' => 6),
@@ -36,9 +35,6 @@ class ModeratorForm extends CFormModel {
 
 			array('newPassword', 'length', 'min' => 6, 'on' => self::EDIT_PROFILE_SCENARIO),
 			array('newPassword2', 'compare', 'compareAttribute' => 'newPassword', 'on' => self::EDIT_PROFILE_SCENARIO),
-
-			array('langs','type','type'=>'array','allowEmpty' => false, 'message' => 'Choose at least one language from the list'),
-			array('langs', 'LanguageAllowed', 'message' => 'One of the languages is not allowed'),
 		);
 	}
 
@@ -46,7 +42,7 @@ class ModeratorForm extends CFormModel {
 		$email = $this->attributes[$attribute];
 
 		// check email for new moderator
-		if (!ProfileHelper::isEmailUnique('Moderator', $email, true)) {
+		if (!ProfileHelper::isEmailUnique('Project', $email, true)) {
 			$this->addError($attribute, 'Email ' . $email . ' already exists');
 		}
 	}
@@ -56,38 +52,14 @@ class ModeratorForm extends CFormModel {
 			'email'=>'Email',
 			'password'=>'Password',
 			'password2'=>'Enter password again',
-			'languages' => 'Which languages do you speak?',
-			'paypal' => 'Your paypal account'
+			'project' => 'Your project name'
 		);
 	}
 
-	/**
-	 * Method checks if all the languages posted by user is allowed
-	 * @param $attribute
-	 * @param $params
-	 * @return bool
-	 */
-	public function LanguageAllowed($attribute, $params) {
-		$languages = $this->attributes[$attribute];
-		if (empty($languages)) {
-			return false;
-		}
-
-		$allowedLanguagesList = array_keys(LanguagesHelper::getAllowedLanguagesList());
-		foreach($languages as $language) {
-			if (!in_array($language, $allowedLanguagesList)) {
-				$this->addError($attribute, 'One of the languages (' . $language . ') is not allowed');
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public function populateFromModel(Moderator $model) {
+	public function populateFromModel(Project $model) {
 		$this->name = $model->name;
 		$this->email = $model->email;
-		$this->langs = $model->langs;
-		$this->paypal = $model->paypal;
+		$this->project = $model->paypal;
 		$this->_id = $model->_id;
 	}
 
@@ -105,5 +77,4 @@ class ModeratorForm extends CFormModel {
 			}
 		}
 	}
-
 }
