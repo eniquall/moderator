@@ -11,7 +11,7 @@ Yii::getLogger()->autoFlush = 1;
 
 return array(
 	'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
-	'name' => '@@NAME@@',
+	'name' => 'ModeratorService',
 
 	'sourceLanguage' => 'en',
 	'language' => 'en',
@@ -69,19 +69,11 @@ return array(
 			'class' => 'CLogRouter',
 			'routes' => array(
 				array(
-					'class' => 'application.extensions.GrayLogRoute.DGGrayLogRoute',
-					'enabled' => false,
-					'levels'  => 'error, warning, trace, info',
-					'host' => '@@GRAYLOG_HOST@@',
-					'port' => '@@GRAYLOG_PORT@@',
-					'apphost' => '@@URL@@',
-				),
-				array(
 					'class' => 'application.extensions.PRFLR.PRFLRLogRoute',
-					'enabled' => false,
+					'enabled' => true,
 					'levels'  => 'profile',
-					'host'   => '@@PROFILER_HOST@@',
-					'source' => '@@URL@@',
+                			'source' => 'moderator',
+                    			'apikey' => '234fgrtnsdfk453409s5',
 				),
 			),
 		),
