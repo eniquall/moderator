@@ -72,8 +72,10 @@ return array(
 					'class' => 'application.extensions.PRFLR.PRFLRLogRoute',
 					'enabled' => true,
 					'levels'  => 'profile',
-                	'source' => 'moderator',
-                    'apikey' => '234fgrtnsdfk453409s5',
+                			'source' => 'moderator',
+                    			'apikey' => '234fgrtnsdfk453409s5',
+                    			'email'  => 'info@moderator.com',
+                    			'pass'   => '1234567890'
 				),
 			),
 		),
