@@ -3,7 +3,7 @@
 	$form = $this->beginWidget('CActiveForm', array(
 		'id' => 'moderatorForm',
 		'action' =>
-		($model->getScenario() == ModeratorForm::REGISTRATION_SCENARIO)
+		($model->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO)
 			? Yii::app()->createUrl("/moderator/registration/")
 			: Yii::app()->createUrl("/moderator/editProfile/"),
 		'enableClientValidation'=>true,
@@ -12,7 +12,7 @@
 		),
 	));
 	?>
-<?php if ($model->getScenario() == ModeratorForm::EDIT_PROFILE_SCENARIO) {?>
+<?php if ($model->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {?>
 	<div class="row">
 		<?= $form->hiddenField($model, '_id'); ?>
 	</div>
@@ -35,13 +35,13 @@
 	</div>
 
 
-<?php if ($model->getScenario() == ModeratorForm::REGISTRATION_SCENARIO) {?>
+<?php if ($model->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO) {?>
 	<div class="row">
 		<?= $form->label($model, 'password2', array('label' => $model->getAttributeLabel("password2"))); ?>
 		<?= $form->passwordField($model, 'password2', array('class' => 'shortField')); ?>
 		<?= $form->error($model, 'password2'); ?>
 	</div>
-<?php } else if ($model->getScenario() == ModeratorForm::EDIT_PROFILE_SCENARIO) {?>
+<?php } else if ($model->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {?>
 	<div class="row">
 		<?= $form->label($model, 'newPassword', array('label' => $model->getAttributeLabel("newPassword"))); ?>
 		<?= $form->passwordField($model, 'newPassword', array('class' => 'shortField')); ?>
@@ -68,7 +68,7 @@
 	</div>
 
 	<div class="row">
-		<input type="submit" value="<?= $model->getScenario() == ModeratorForm::REGISTRATION_SCENARIO ? "Register" : "Edit"; ?>">
+		<input type="submit" value="<?= $model->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO ? "Register" : "Edit"; ?>">
 	</div>
 	<?php $this->endWidget(); ?>
 </div>

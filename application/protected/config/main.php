@@ -4,10 +4,8 @@
 mb_internal_encoding("UTF-8");
 
 // add real time logging
-Yii::getLogger()->autoDump = 1;
-Yii::getLogger()->autoFlush = 1;
-
-
+//Yii::getLogger()->autoDump = 1;
+//Yii::getLogger()->autoFlush = 1;
 
 return array(
 	'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
@@ -21,6 +19,7 @@ return array(
 	// autoloading model and component classes
 	'import' => array(
 		'application.components.*',
+		'application.controllers.BaseProfileController',
 		'application.models.forms.*',
 		'application.models.*',
 		'application.helpers.*',
@@ -72,11 +71,18 @@ return array(
 					'class' => 'application.extensions.PRFLR.PRFLRLogRoute',
 					'enabled' => true,
 					'levels'  => 'profile',
-                			'source' => 'moderator',
-                    			'apikey' => '234fgrtnsdfk453409s5',
-                    			'email'  => 'info@moderator.com',
-                    			'pass'   => '1234567890'
+							'source' => 'moderator',
+								'apikey' => '234fgrtnsdfk45309s5',
+								//'email'  => 'info@moderator.com',
+								//'pass'   => '1234567890'
 				),
+
+				array(
+					'class' => 'CWebLogRoute'
+				),
+				array(
+					'class' => 'CFileLogRoute'
+				)
 			),
 		),
 	),

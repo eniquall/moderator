@@ -11,16 +11,17 @@ class UserIdentity extends CUserIdentity
 	public $role;
 	private $_id;
 
-
 	const MODERATOR_ROLE = 'Moderator';
-	const PROJECT_ROLE = 'Project';
+	const PROJECT_ROLE   = 'Project';
+	const ADMIN_ROLE     = 'Admin';
 
 	/**
 	 * Authenticates a user.
 	 * @return boolean whether authentication succeeds.
 	 */
 	public function authenticate() {
-		$userModel = new $this->role;
+		$userModelClass = $this->getModelClass();
+		$userModel = new $userModelClass;
 
 		$user = $userModel::model()->find(
 			array(
@@ -64,5 +65,9 @@ class UserIdentity extends CUserIdentity
 
 	public function getRole() {
 		return $this->role;
+	}
+
+	public function getModelClass() {
+		return $this->getRole() . 'Model';
 	}
 }

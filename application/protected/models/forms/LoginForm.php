@@ -47,7 +47,7 @@ class LoginForm extends CFormModel
 	public function authenticate($attribute,$params)
 	{
 		$this->_identity=new UserIdentity($this->email,$this->password);
-		$this->_identity->setRole(UserIdentity::MODERATOR_ROLE);
+		$this->_identity->setRole($this->getScenario());
 
 		if(!$this->_identity->authenticate())
 			$this->addError('password','Incorrect email or password.');

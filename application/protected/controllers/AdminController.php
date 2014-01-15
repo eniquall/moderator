@@ -5,7 +5,11 @@
  * Time: 1:56 AM
  */
 
-class AdminController extends Controller {
+class AdminController extends BaseProfileController {
+	public function getLoginUserRole() {
+		return UserIdentity::MODERATOR_ROLE;
+	}
+
 	public function actionShowModeratorsList() {
 		$this->render('moderatorsList');
 	}

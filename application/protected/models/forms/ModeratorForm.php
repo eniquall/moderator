@@ -4,7 +4,8 @@
  * Time: 11:37 PM
  */
 
-class ModeratorForm extends CFormModel {
+class ModeratorForm extends BaseProfileForm {
+	use BaseProfileTrait;
 	public $name;
 	public $email;
 	public $password;
@@ -16,9 +17,6 @@ class ModeratorForm extends CFormModel {
 	public $langs;
 	public $paypal;
 	public $_id;
-
-	const REGISTRATION_SCENARIO = 'registration';
-	const EDIT_PROFILE_SCENARIO = 'edit';
 
 	public function rules() {
 		return array(
@@ -42,14 +40,6 @@ class ModeratorForm extends CFormModel {
 		);
 	}
 
-	public function uniqueEmail($attribute, $params) {
-		$email = $this->attributes[$attribute];
-
-		// check email for new moderator
-		if (!ProfileHelper::isEmailUnique('Moderator', $email, true)) {
-			$this->addError($attribute, 'Email ' . $email . ' already exists');
-		}
-	}
 	public function attributeLabels() {
 		return array(
 			'name'=>'Your name',
@@ -83,7 +73,7 @@ class ModeratorForm extends CFormModel {
 		return true;
 	}
 
-	public function populateFromModel(Moderator $model) {
+	public function populateFromModel(ModeratorModel $model) {
 		$this->name = $model->name;
 		$this->email = $model->email;
 		$this->langs = $model->langs;
@@ -91,19 +81,7 @@ class ModeratorForm extends CFormModel {
 		$this->_id = $model->_id;
 	}
 
-	public function checkForNewPassword($attribute, $params) {
-		$password = $this->attributes[$attribute];
-		$newPassword = $this->attributes['newPassword'];
-
-		//if user entered new password - check if he entered correct current password
-		if (!empty($newPassword)) {
-			$userModel = Yii::app()->user->getModel();
-			if (!$userModel->validatePassword($password)) {
-				$this->addError($attribute, 'Current correct password should be entered');
-			} else {
-				Yii::app()->user->setFlash('success', 'Password changed sucessfully');
-			}
-		}
+	public function getModelClass() {
+		return 'ModeratorModel';
 	}
-
 }

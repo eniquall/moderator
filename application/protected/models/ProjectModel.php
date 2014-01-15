@@ -3,9 +3,10 @@
 /**
  * This is the MongoDB Document model class based on table "project".
  */
-class Project extends CPModel {
+class ProjectModel extends CPModel {
+	use BaseProfileTrait;
+
 	public $_id;
-	public $project;
 	public $apiKey;
 	public $email;
 	public $name;
@@ -16,7 +17,7 @@ class Project extends CPModel {
 
 	/**
 	 * Returns the static model of the specified AR class.
-	 * @return Project the static model class
+	 * @return ProjectModel the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -39,6 +40,11 @@ class Project extends CPModel {
 		return 'project';
 	}
 
+	public function getCollectionStructure()
+	{
+		return array('name' => 'project');
+	}
+
 	/**
 	 * @return array validation rules for model attributes.
 	 */
@@ -47,17 +53,17 @@ class Project extends CPModel {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('_id, project, apiKey, email, name, password', 'required'),
-			array('_id, balance, isActive', 'numerical', 'integerOnly'=>true),
+			array('email, name, password', 'required'),
+			array('balance, isActive', 'numerical', 'integerOnly'=>true),
 			array('isActive', 'in', 'range' => [0,1]),
-			array('project', 'length', 'max'=>50),
-			array('apiKey, password', 'length', 'max'=>32),
+			array('apiKey, password', 'length', 'is'=>32, 'on' => BaseProfileForm::EDIT_PROFILE_SCENARIO),
+			array('email', 'uniqueEmail'),
 			array('email', 'length', 'max'=>100),
 			array('name', 'length', 'max'=>45),
 			array('notes', 'length', 'max'=>1000),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('_id, project, apiKey, email, name, password, balance, notes, isActive', 'safe', 'on'=>'search'),
+			array('_id, apiKey, email, name, password, balance, notes, isActive', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -68,7 +74,6 @@ class Project extends CPModel {
 	{
 		return array(
 			'_id' => 'ID',
-			'project' => 'Project',
 			'apiKey' => 'Api Key',
 			'email' => 'Email',
 			'name' => 'Name',

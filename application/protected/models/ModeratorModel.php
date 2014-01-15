@@ -1,5 +1,7 @@
 <?php
-class Moderator extends CPModel {
+class ModeratorModel extends CPModel {
+	use BaseProfileTrait;
+
 	public $_id;
 	public $name;
 	public $email;
@@ -64,31 +66,5 @@ class Moderator extends CPModel {
 			array('email', 'uniqueEmail'),
 			array('isActive, isSuperModerator', 'in', 'range' => [0,1]),
 		);
-	}	
-	
-	/**
-	 * Check unique name in collection 
-	 * 
-	 * @param unknown_type $attribute
-	 * @param unknown_type $params
-	 */
-	public function uniqueEmail($attribute, $params)
-	{
-		$email = $this->attributes[$attribute];
-		
-		$criteria = new EMongoCriteria();
-		$criteria->email = $email;
-		
-		if (!$this->getIsNewRecord()) {  
-			$criteria->_id('!=', $this->_id);
-		}
-		
-		if ($this->count($criteria) ) {
-			$this->addError($attribute, 'Email ' . $email . ' already exists');
-		}
-	}
-
-	public function validatePassword($password) {
-		return md5($password) === $this->password;
 	}
 }

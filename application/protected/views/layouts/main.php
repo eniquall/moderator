@@ -30,10 +30,11 @@
 			'items'=>array(
 				array('label'=>'Home', 'url'=>array('')),
 				array('label'=>'About', 'url'=>array('/static/about')),
-				array('label'=>'Registration for moderator', 'url'=>array('/moderator/registration'), 'visible'=>Yii::app()->user->isGuest),
+				array('label'=>'Moderator registration', 'url'=>array('/moderator/registration'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Login for moderator', 'url'=>array('/moderator/login'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Edit moderator profile', 'url'=>array('/moderator/editProfile'), 'visible'=>Yii::app()->user->isModerator()),
 
+				array('label'=>'Project registration', 'url'=>array('/project/registration'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Login for project', 'url'=>array('/project/login'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Edit project profile', 'url'=>array('/project/editProfile'), 'visible'=>Yii::app()->user->isProject()),
 

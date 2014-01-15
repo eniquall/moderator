@@ -5,53 +5,33 @@
  * Time: 11:29 PM
  */
 
-Yii::import('application.models.forms.ModeratorForm');
-Yii::import('application.models.forms.LoginForm');
-Yii::import('application.models.Moderator');
-class ModeratorController extends Controller {
+class ModeratorController extends BaseProfileController {
+	public function getLoginUserRole() {
+		return UserIdentity::MODERATOR_ROLE;
+	}
+
+	public function getAfterLoginUrl(){
+		return $this->createUrl('/moderator/moderate');
+	}
 
 	public function actionRegistration() {
-		$model = new ModeratorForm(ModeratorForm::REGISTRATION_SCENARIO);
+		$model = new ModeratorForm(BaseProfileForm::REGISTRATION_SCENARIO);
 		if (isset($_POST['ModeratorForm'])) {
 			$model->attributes = $_POST['ModeratorForm'];
 			if ($model->validate()) {
 				if ($this->_saveModeratorProfile($model)) {
-					$this->redirect('/moderator/moderate');
+					$this->redirect($this->getAfterLoginUrl());
 				}
 			}
 		}
 		$this->render('registration', array('model' => $model));
 	}
 
-	public function actionLogin() {
-		$model = new LoginForm();
-		if (isset($_POST['LoginForm'])) {
-			$model->attributes = $_POST['LoginForm'];
-			if ($model->validate() && $model->login()) {
-				$returnUrl = !empty(Yii::app()->user->returnUrl)
-					? Yii::app()->user->returnUrl
-					: $this->createUrl('/moderator/moderate');
-				$this->redirect($returnUrl);
-			}
-		}
-
-		$this->render('login', array('model' => $model));
-	}
-
-	/**
-	 * Logs out the current user and redirect to homepage.
-	 */
-	public function actionLogout()
-	{
-		Yii::app()->user->logout();
-		$this->redirect(Yii::app()->homeUrl);
-	}
-
 	/**
 	 * Edit profile of the current moderator
 	 */
 	public function actionEditProfile() {
-		$formModel = new ModeratorForm(ModeratorForm::EDIT_PROFILE_SCENARIO);
+		$formModel = new ModeratorForm(BaseProfileForm::EDIT_PROFILE_SCENARIO);
 
 		if (isset($_POST['ModeratorForm'])) {
 
@@ -73,7 +53,7 @@ class ModeratorController extends Controller {
 
 	public function _saveModeratorProfile(ModeratorForm $formModel) {
 		$moderator = null;
-		if ($formModel->getScenario() == ModeratorForm::EDIT_PROFILE_SCENARIO) {
+		if ($formModel->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {
 			if (Yii::app()->user->getId() != $formModel->_id) {
 				throw new CHttpException(403, "You are trying to edit profile, but not loggged in");
 			} else {
@@ -81,14 +61,16 @@ class ModeratorController extends Controller {
 				// save new password if it was entered
 				// additional validations were performed with ModeratorForm validations (checkForNewPassword)
 				if (!empty($formModel->newPassword)) {
-					$moderator->password = md5($formModel->newPassword);
+					$moderator->password = SecurityHelper::generatePasswordHash($formModel->newPassword);
 				}
 			}
-		} else if ($formModel->getScenario() == ModeratorForm::REGISTRATION_SCENARIO){
-			$moderator = new Moderator();
+		} else if ($formModel->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO){
+			$moderator = new ModeratorModel();
 			// save md5 hash of password
-			$moderator->password = md5($formModel->password);
+			$moderator->password = SecurityHelper::generatePasswordHash($formModel->password);
 		}
+
+		$moderator->setScenario($formModel->getScenario());
 
 		$moderator->name  = $formModel->name;
 		$moderator->email = mb_strtolower($formModel->email);
@@ -99,7 +81,8 @@ class ModeratorController extends Controller {
 
 		$result = $moderator->save();
 		if (!$result) {
-			Yii::log(__CLASS__ . " " . __METHOD__ .  "Can't save moderator profile (scenario: " . $scenario . "): " . CJSON::encode($moderator->getErrors()));
+			Yii::log(__CLASS__ . " " . __METHOD__ .  "Can't save moderator profile (scenario: " . $formModel->getScenario() . "): " .
+				CJSON::encode($moderator->getAttributes()) . " " . CJSON::encode($moderator->getErrors()));
 		} else {
 			Yii::app()->user->setFlash('success', 'Profile successfully saved');
 		};

@@ -33,7 +33,7 @@ class WebUser extends CWebUser {
 
 	/**
 	 * Methods return model of the current user
-	 * @return null|Moderator
+	 * @return null|ModeratorModel
 	 */
 	public function getModel() {
 		if (Yii::app()->user->isGuest) {
@@ -41,8 +41,12 @@ class WebUser extends CWebUser {
 		}
 
 		// can be Moderator or Project
-		$modelClassName = $this->getState('role');
+		$modelClassName = $this->getModelClass();
 		$model = $modelClassName::model()->findByPk(new MongoID($this->getId()));
 		return $model;
+	}
+
+	public function getModelClass() {
+		return $this->getState('role') . 'Model';
 	}
 }

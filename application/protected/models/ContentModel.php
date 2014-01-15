@@ -3,10 +3,10 @@
 /**
  * This is the MongoDB Document model class based on table "content".
  */
-class Content extends CPModel {
+class ContentModel extends CPModel {
 	public $_id;
 	public $uid;
-	public $project;
+	public $projectId;
 	public $type;
 	public $lang;
 	public $data;
@@ -20,7 +20,7 @@ class Content extends CPModel {
 
 	/**
 	 * Returns the static model of the specified AR class.
-	 * @return Content the static model class
+	 * @return ContentModel the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -43,6 +43,11 @@ class Content extends CPModel {
 		return 'content';
 	}
 
+	public function getCollectionStructure()
+	{
+		return array('name' => 'content');
+	}
+
 	/**
 	 * @return array validation rules for model attributes.
 	 */
@@ -51,10 +56,12 @@ class Content extends CPModel {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('uid, project, type, lang, createdDate', 'required'),
+			array('uid, projectId, type, lang, createdDate', 'required'),
 			array('result, isDelivered', 'numerical', 'integerOnly'=>true),
+			array('isDelivered', 'in', 'range' => [0,1]),
 			array('uid', 'length', 'max'=>100),
-			array('project, type, data, context, stat', 'length', 'max'=>45),
+			array('type, data, context, stat', 'length', 'max'=>45),
+			array('projectId', 'length', 'is'=>24),
 			array('lang', 'length', 'max'=>2),
 			array('checkedDate, resultDate', 'safe'),
 			// The following rule is used by search().
@@ -71,7 +78,7 @@ class Content extends CPModel {
 		return array(
 			'_id' => 'ID',
 			'uid' => 'Uid',
-			'project' => 'Project',
+			'projectId' => 'Project Id',
 			'type' => 'Type',
 			'lang' => 'Lang',
 			'data' => 'Data',
