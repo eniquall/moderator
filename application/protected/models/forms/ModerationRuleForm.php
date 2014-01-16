@@ -6,12 +6,17 @@
  * Time: 1:13 AM
  */
 
-class ModerationRuleForm extends BaseProfileForm {
+class ModerationRuleForm extends CFormModel {
+	use ModrationRuleValidationTrait;
+
 	public $_id;
 	public $projectId;
 	public $type;
 	public $text;
 	public $level;
+
+	const ADD_RULE_SCENARIO = 'add';
+	const EDIT_RULE_SCENARIO = 'edit';
 
 	public function rules()
 	{
@@ -24,6 +29,7 @@ class ModerationRuleForm extends BaseProfileForm {
 			array('level', 'Odd'),
 
 			array('type', 'TypeAllowed', 'message' => 'Content type is not allowed'),
+			array('type', 'UniqueRule', 'You already have reule of this type'),
 			array('text', 'length', 'max'=>1000),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -34,5 +40,4 @@ class ModerationRuleForm extends BaseProfileForm {
 	public function getModelClass() {
 		return 'ModerationRule';
 	}
-
-} 
+}

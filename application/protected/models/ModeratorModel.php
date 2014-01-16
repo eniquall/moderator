@@ -1,6 +1,6 @@
 <?php
 class ModeratorModel extends CPModel {
-	use BaseProfileTrait;
+	use BaseProfileValidationTrait;
 
 	public $_id;
 	public $name;

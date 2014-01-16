@@ -51,8 +51,8 @@ class ProjectController extends BaseProfileController {
 	protected function _saveProjectProfile(ProjectForm $formModel) {
 		$project = null;
 		if ($formModel->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {
-			if (Yii::app()->user->getId() != $formModel->_id) {
-				throw new CHttpException(403, "You are trying to edit profile, but not loggged in");
+			if ((Yii::app()->user->getId() != $formModel->_id) || (Yii::app()->user->getRole() != UserIdentity::PROJECT_ROLE)) {
+				throw new CHttpException(403, "You are trying to edit profile, but not loggged in as project administrator");
 			} else {
 				$project = Yii::app()->user->getModel();
 				// save new password if it was entered
@@ -106,6 +106,60 @@ class ProjectController extends BaseProfileController {
 
 
 	public function actionAddModerationRule() {
-		$this->render('moderationRule/add');
+		$model = new ModerationRuleForm(ModerationRuleForm::ADD_RULE_SCENARIO);
+		if (isset($_POST['ModerationRuleForm'])) {
+			$model->attributes = $_POST['ModerationRuleForm'];
+			if ($model->validate()) {
+				if ($this->_saveModerationRuleProfile($model)) {
+					$this->redirect($this->getAfterLoginUrl());
+				}
+			}
+		}
+
+		$this->render('moderationRule/add', array('model' => $model));
+	}
+
+	protected function _saveModerationRuleProfile($formModel) {
+		$project = null;
+
+		if (Yii::app()->user->getRole() != UserIdentity::PROJECT_ROLE) {
+			throw new CHttpException(403, "You are trying to edit moderation rule but not loggged in as profile administrator or this rule belongs to another project");
+		}
+
+		if ($formModel->getScenario() == ModerationRuleForm::EDIT_PROFILE_SCENARIO) {
+			// if rule not belons to current logged in project profile
+			$moderationRule = ModerationRuleModel::model()->findByPk(new MongoId($formModel->_id));
+
+			if (empty($moderationRule)) {
+				throw new CHttpException(500, "Moderation rule not found");
+			}
+
+			if ($moderationRule->projectId != Yii::app()->user->_id) {
+				throw new CHttpException(403, "This rule belongs to another project. Use another account to edit it.");
+			}
+		} else if ($formModel->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO) {
+			$project = Yii::app()->user->getModel();
+
+			$moderationRule = new ModerationRuleModel();
+			$moderationRule->projectId = $project->_id;
+		}
+
+		// validate model with the same scenario as form model
+		$moderationRule->setScenario($formModel->getScenario());
+
+		$moderationRule->type = $formModel->type;
+		$moderationRule->text = $formModel->text;
+		$moderationRule->level = $formModel->level;
+
+		$result = $moderationRule->save();
+		if (!$result) {
+			Yii::log(__CLASS__ . " " . __METHOD__ .  "Can't save moderation rule model (scenario: " . $formModel->getScenario() . "): " .
+				CJSON::encode($project->getAttributes()) . " " . CJSON::encode($moderationRule->getErrors()));
+			Yii::app()->user->setFlash('error', 'Error. Moderation rule was not saved.');
+		} else {
+			Yii::app()->user->setFlash('success', 'Moderation rule successfully saved');
+		};
+
+		return $result;
 	}
 }

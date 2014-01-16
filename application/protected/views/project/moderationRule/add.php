@@ -1,2 +1,3 @@
+<h1>Add new moderation rule</h1>
 <?php
-echo __METHOD__;
+$this->renderPartial('moderationRule/_moderationRuleForm', array('model' => $model));

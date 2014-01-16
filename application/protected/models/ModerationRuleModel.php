@@ -4,8 +4,10 @@
  * This is the MongoDB Document model class based on table "moderationRule".
  */
 class ModerationRuleModel extends CPModel {
+	use ModrationRuleValidationTrait;
+
 	public $_id;
-	public $project;
+	public $projectId;
 	public $type;
 	public $text;
 	public $level;
@@ -53,34 +55,13 @@ class ModerationRuleModel extends CPModel {
 			array('level', 'Odd'),
 
 			array('type', 'TypeAllowed', 'message' => 'Content type is not allowed'),
+			array('type', 'UniqueRule', 'You already have reule of this type'),
 
 			array('text', 'length', 'max'=>1000),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('_id, projectId, type, text, level', 'safe', 'on'=>'search'),
 		);
-	}
-
-	public function Odd($attribute, $params) {
-		$level = $this->attributes[$attribute];
-
-		if ($level % 2 != 1) {
-			$this->addError($attribute, 'Level ( ' . $level . ' ) should be odd (1,3,5,7...)');
-		}
-	}
-
-	public function TypeAllowed($attribute, $params) {
-		$type = $this->attributes[$attribute];
-		if (empty($languages)) {
-			return false;
-		}
-
-		$allowedTypesList = (ContentHelper::getAllowedTypesList());
-		if (!in_array($type, $allowedTypesList)) {
-			$this->addError($attribute, 'Type (' . $type . ') is not allowed');
-			return false;
-		}
-		return true;
 	}
 
 	/**

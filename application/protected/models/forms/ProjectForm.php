@@ -34,7 +34,6 @@ class ProjectForm extends BaseProfileForm {
 			array('newPassword', 'length', 'min' => 6, 'on' => self::EDIT_PROFILE_SCENARIO),
 			array('newPassword2', 'compare', 'compareAttribute' => 'newPassword', 'on' => self::EDIT_PROFILE_SCENARIO),
 			array('isActive', 'in', 'range' => [0,1]),
-			array('apiKey, password', 'length', 'is'=>32, 'on' => BaseProfileForm::EDIT_PROFILE_SCENARIO),
 		);
 	}
 

@@ -1,7 +1,3 @@
+<h1>Edit moderation rule</h1>
 <?php
-/**
- * Created by PhpStorm.
- * User: eniquall
- * Date: 1/15/14
- * Time: 1:10 AM
- */ 
+$this->renderPartial('_moderationRuleForm', array('model' => $model));

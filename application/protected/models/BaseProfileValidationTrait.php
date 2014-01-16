@@ -5,7 +5,7 @@
  * Time: 1:24 AM
  */
 
-trait BaseProfileTrait {
+trait BaseProfileValidationTrait {
 	public function uniqueEmail($attribute, $params) {
 		$email = $this->attributes[$attribute];
 

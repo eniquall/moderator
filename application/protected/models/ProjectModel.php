@@ -4,7 +4,7 @@
  * This is the MongoDB Document model class based on table "project".
  */
 class ProjectModel extends CPModel {
-	use BaseProfileTrait;
+	use BaseProfileValidationTrait;
 
 	public $_id;
 	public $apiKey;

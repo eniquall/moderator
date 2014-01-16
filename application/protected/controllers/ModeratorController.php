@@ -54,7 +54,7 @@ class ModeratorController extends BaseProfileController {
 	public function _saveModeratorProfile(ModeratorForm $formModel) {
 		$moderator = null;
 		if ($formModel->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {
-			if (Yii::app()->user->getId() != $formModel->_id) {
+			if ((Yii::app()->user->getId() != $formModel->_id) || (Yii::app()->user->getRole() != UserIdentity::MODERATOR_ROLE)) {
 				throw new CHttpException(403, "You are trying to edit profile, but not loggged in");
 			} else {
 				$moderator = Yii::app()->user->getModel();

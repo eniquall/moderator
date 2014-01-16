@@ -5,7 +5,8 @@
  */
 
 class ModeratorForm extends BaseProfileForm {
-	use BaseProfileTrait;
+	use BaseProfileValidationTrait;
+
 	public $name;
 	public $email;
 	public $password;
