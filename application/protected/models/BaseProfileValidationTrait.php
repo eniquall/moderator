@@ -40,4 +40,26 @@ trait BaseProfileValidationTrait {
 		$hash = $this->password;
 		return SecurityHelper::validatePassword($password, $hash);
 	}
+
+	/**
+	 * Method checks if all the languages posted by user is allowed
+	 * @param $attribute
+	 * @param $params
+	 * @return bool
+	 */
+	public function LanguageAllowed($attribute, $params) {
+		$languages = $this->attributes[$attribute];
+		if (empty($languages)) {
+			return false;
+		}
+
+		$allowedLanguagesList = array_keys(LanguagesHelper::getAllowedLanguagesList());
+		foreach($languages as $language) {
+			if (!in_array($language, $allowedLanguagesList)) {
+				$this->addError($attribute, 'One of the languages (' . $language . ') is not allowed');
+				return false;
+			}
+		}
+		return true;
+	}
 }

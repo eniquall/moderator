@@ -29,7 +29,7 @@ class ModerationRuleForm extends CFormModel {
 			array('level', 'Odd'),
 
 			array('type', 'TypeAllowed', 'message' => 'Content type is not allowed'),
-			array('type', 'UniqueRule', 'You already have reule of this type'),
+			array('type', 'UniqueRule', 'You already have rule of this type'),
 			array('text', 'length', 'max'=>1000),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.

@@ -10,6 +10,27 @@ class ModeratorController extends BaseProfileController {
 		return UserIdentity::MODERATOR_ROLE;
 	}
 
+	public function init() {
+		Yii::app()->user->loginUrl = '/moderator/login';
+	}
+
+	public function accessRules() {
+		return array(
+			array('deny',
+				'actions'=>array('EditProfile', 'Moderate'),
+				'users'=>array('?'),
+			),
+			array('deny',
+				'actions'=>array('Registration'),
+				'users'=>array('@'),
+			),
+			array('allow',
+				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule'),
+				'roles'=>array(UserIdentity::PROJECT_ROLE, UserIdentity::ADMIN_ROLE),
+			),
+		);
+	}
+
 	public function getAfterLoginUrl(){
 		return $this->createUrl('/moderator/moderate');
 	}

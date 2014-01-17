@@ -12,6 +12,9 @@
 		),
 	));
 	?>
+
+<?php echo $form->errorSummary($model); ?>
+
 <?php if ($model->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {?>
 	<div class="row">
 		<?= $form->hiddenField($model, '_id'); ?>

@@ -10,6 +10,27 @@ class ProjectController extends BaseProfileController {
 		return UserIdentity::PROJECT_ROLE;
 	}
 
+	public function init() {
+		Yii::app()->user->loginUrl = '/project/login';
+	}
+
+	public function accessRules() {
+		return array(
+			array('deny',
+				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule'),
+				'users'=>array('?'),
+			),
+			array('deny',
+				'actions'=>array('Registration'),
+				'users'=>array('@'),
+			),
+			array('allow',
+				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule'),
+				'roles'=>array(UserIdentity::PROJECT_ROLE, UserIdentity::ADMIN_ROLE),
+			),
+		);
+	}
+
 	public function getAfterLoginUrl() {
 		return $this->createUrl('/project/addModerationRule');
 	}
@@ -104,9 +125,12 @@ class ProjectController extends BaseProfileController {
 		return $result;
 	}
 
-
 	public function actionAddModerationRule() {
 		$model = new ModerationRuleForm(ModerationRuleForm::ADD_RULE_SCENARIO);
+
+		$project = Yii::app()->user->getModel();
+		$model->projectId = $project->getId();
+
 		if (isset($_POST['ModerationRuleForm'])) {
 			$model->attributes = $_POST['ModerationRuleForm'];
 			if ($model->validate()) {
@@ -117,6 +141,10 @@ class ProjectController extends BaseProfileController {
 		}
 
 		$this->render('moderationRule/add', array('model' => $model));
+	}
+
+	public function actionEditModerationRule() {
+
 	}
 
 	protected function _saveModerationRuleProfile($formModel) {

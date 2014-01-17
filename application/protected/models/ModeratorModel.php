@@ -65,6 +65,9 @@ class ModeratorModel extends CPModel {
 			array('name, email, password, langs, paypal', 'required'),
 			array('email', 'uniqueEmail'),
 			array('isActive, isSuperModerator', 'in', 'range' => [0,1]),
+
+			array('langs','type','type'=>'array','allowEmpty' => false, 'message' => 'Choose at least one language from the list'),
+			array('langs', 'LanguageAllowed', 'message' => 'One of the languages is not allowed'),
 		);
 	}
 }

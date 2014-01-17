@@ -32,4 +32,12 @@ abstract class BaseProfileController extends Controller {
 
 	abstract function getLoginUserRole();
 	abstract function getAfterLoginUrl();
+
+	public function filters()
+	{
+		return array(
+			'accessControl',
+		);
+	}
+
 } 
