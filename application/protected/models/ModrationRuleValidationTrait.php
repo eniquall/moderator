@@ -36,12 +36,14 @@ trait ModrationRuleValidationTrait {
 		$criteria->type = $type;
 		$criteria->projectId = $projectId;
 
+
 		if (!$isNewInstance) {
 			$_id = $this->attributes['_id'];
-			$criteria->_id('!=', $_id);
+			$criteria->_id('!=', new MongoId($_id));
 		}
 
 		if (ModerationRuleModel::model()->count($criteria)) {
+			$this->addError($attribute, 'Rule for this type of content for curfrent project exists already (' . $attribute . ') ');
 			return false;
 		}
 		return true;

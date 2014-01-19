@@ -38,9 +38,8 @@
 				array('label'=>'Login for project', 'url'=>array('/project/login'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Edit project profile', 'url'=>array('/project/editProfile'), 'visible'=>Yii::app()->user->isProject()),
 
-				array('label'=>'Add moderation rule', 'url' => '/project/AddModerationRule', 'visible'=>Yii::app()->user->isProject()),
-				array('label'=>'Edit moderation rule', 'url' => '/project/EditModerationRule', 'visible'=>Yii::app()->user->isProject()),
-				array('label'=>'Show moderation rules', 'url' => '/project/ShowModerationRule', 'visible'=>Yii::app()->user->isProject()),
+				array('label'=>'Add moderation rule', 'url' => '/project/addModerationRule', 'visible'=>Yii::app()->user->isProject()),
+				array('label'=>'Show moderation rules', 'url' => '/project/showModerationRulesList', 'visible'=>Yii::app()->user->isProject()),
 
 				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/moderator/logout'), 'visible'=>!Yii::app()->user->isGuest)
 			),
@@ -61,13 +60,6 @@
 
 	<?php echo $content; ?>
 
-	<?php
-		if (Yii::app()->user->isGuest) {
-			echo "guest";
-		} else {
-			echo Yii::app()->user->name . " " . Yii::app()->user->getId() . " " ;
-		}
-	?>
 	<div id="footer">
 		Copyright &copy; <?php echo date('Y'); ?> by My Company.<br/>
 		All Rights Reserved.<br/>

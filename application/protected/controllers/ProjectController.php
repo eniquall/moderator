@@ -52,7 +52,6 @@ class ProjectController extends BaseProfileController {
 		$formModel = new ProjectForm(BaseProfileForm::EDIT_PROFILE_SCENARIO);
 
 		if (isset($_POST['ProjectForm'])) {
-
 			$formModel->attributes = $_POST['ProjectForm'];
 			if ($formModel->validate()) {
 				// register
@@ -69,10 +68,75 @@ class ProjectController extends BaseProfileController {
 		$this->render('editProfile', array('model' => $formModel));
 	}
 
+	public function actionAddModerationRule() {
+		$model = new ModerationRuleForm(ModerationRuleForm::ADD_RULE_SCENARIO);
+
+		$project = Yii::app()->user->getModel();
+		$model->projectId = $project->getId();
+
+		if (isset($_POST['ModerationRuleForm'])) {
+			$model->attributes = $_POST['ModerationRuleForm'];
+			if ($model->validate()) {
+				if ($this->_saveModerationRuleProfile($model)) {
+					$this->redirect($this->createUrl('/project/showModerationRulesList'));
+				}
+			}
+		}
+
+		$this->render('moderationRule/add', array('model' => $model));
+	}
+
+	public function actionEditModerationRule() {
+		$model = new ModerationRuleForm(ModerationRuleForm::EDIT_RULE_SCENARIO);
+
+		$project = Yii::app()->user->getModel();
+		$model->projectId = $project->getId();
+
+		if (isset($_POST['ModerationRuleForm'])) {
+			$model->attributes = $_POST['ModerationRuleForm'];
+
+			if ($model->validate()) {
+				if ($this->_saveModerationRuleProfile($model)) {
+					$this->redirect($this->createUrl('/project/showModerationRulesList'));
+				}
+			}
+		} else {
+			$moderationRuleId = Yii::app()->request->getParam('id');
+
+			if (empty($moderationRuleId)) {
+				$this->redirect($this->createUrl('/project/showModerationRulesList'));
+			}
+			$moderationRule = ModerationRuleModel::model()->findByPk(new MongoId($moderationRuleId));
+			$model->populateFromModel($moderationRule);
+		}
+
+		$this->render('moderationRule/add', array('model' => $model));
+	}
+
+	public function actionShowModerationRulesList() {
+		if (Yii::app()->user->role == UserIdentity::PROJECT_ROLE) {
+			$project =  Yii::app()->user->getModel();
+			$projectId = (string) $project->getId();
+		} else {
+			throw new CException("You are not logged in with project profile");
+		}
+
+		$rules = ModerationRuleModel::model()->findAll(
+			array(
+				'conditions' => array(
+					'projectId' => array(
+						'==' => $projectId
+					)
+				)
+			)
+		);
+		$this->render('moderationRule/showList', array('rules' => $rules, 'project' => $project));
+	}
+
 	protected function _saveProjectProfile(ProjectForm $formModel) {
 		$project = null;
 		if ($formModel->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {
-			if ((Yii::app()->user->getId() != $formModel->_id) || (Yii::app()->user->getRole() != UserIdentity::PROJECT_ROLE)) {
+			if ((Yii::app()->user->getId() != $formModel->_id) || (Yii::app()->user->role != UserIdentity::PROJECT_ROLE)) {
 				throw new CHttpException(403, "You are trying to edit profile, but not loggged in as project administrator");
 			} else {
 				$project = Yii::app()->user->getModel();
@@ -115,7 +179,7 @@ class ProjectController extends BaseProfileController {
 
 			if (!$result) {
 				Yii::log(__CLASS__ . " " . __METHOD__ .  "Can't save project profile after generating apiKey (scenario: " . $formModel->getScenario() . "): " .
-						CJSON::encode($project->getAttributes()) . " " . CJSON::encode($project->getErrors()));
+					CJSON::encode($project->getAttributes()) . " " . CJSON::encode($project->getErrors()));
 				Yii::app()->user->setFlash('error', 'Error. Profile was not saved.');
 			} else {
 				Yii::app()->user->setFlash('success', 'Profile successfully saved');
@@ -125,36 +189,14 @@ class ProjectController extends BaseProfileController {
 		return $result;
 	}
 
-	public function actionAddModerationRule() {
-		$model = new ModerationRuleForm(ModerationRuleForm::ADD_RULE_SCENARIO);
-
-		$project = Yii::app()->user->getModel();
-		$model->projectId = $project->getId();
-
-		if (isset($_POST['ModerationRuleForm'])) {
-			$model->attributes = $_POST['ModerationRuleForm'];
-			if ($model->validate()) {
-				if ($this->_saveModerationRuleProfile($model)) {
-					$this->redirect($this->getAfterLoginUrl());
-				}
-			}
-		}
-
-		$this->render('moderationRule/add', array('model' => $model));
-	}
-
-	public function actionEditModerationRule() {
-
-	}
-
 	protected function _saveModerationRuleProfile($formModel) {
 		$project = null;
 
-		if (Yii::app()->user->getRole() != UserIdentity::PROJECT_ROLE) {
+		if (Yii::app()->user->role != UserIdentity::PROJECT_ROLE) {
 			throw new CHttpException(403, "You are trying to edit moderation rule but not loggged in as profile administrator or this rule belongs to another project");
 		}
 
-		if ($formModel->getScenario() == ModerationRuleForm::EDIT_PROFILE_SCENARIO) {
+		if ($formModel->getScenario() == ModerationRuleForm::EDIT_RULE_SCENARIO) {
 			// if rule not belons to current logged in project profile
 			$moderationRule = ModerationRuleModel::model()->findByPk(new MongoId($formModel->_id));
 
@@ -162,14 +204,14 @@ class ProjectController extends BaseProfileController {
 				throw new CHttpException(500, "Moderation rule not found");
 			}
 
-			if ($moderationRule->projectId != Yii::app()->user->_id) {
+			if ($moderationRule->projectId != Yii::app()->user->getId()) {
 				throw new CHttpException(403, "This rule belongs to another project. Use another account to edit it.");
 			}
-		} else if ($formModel->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO) {
+		} else if ($formModel->getScenario() == ModerationRuleForm::ADD_RULE_SCENARIO) {
 			$project = Yii::app()->user->getModel();
 
 			$moderationRule = new ModerationRuleModel();
-			$moderationRule->projectId = $project->_id;
+			$moderationRule->projectId = (string) $project->_id; //use string instead of mongoId object
 		}
 
 		// validate model with the same scenario as form model

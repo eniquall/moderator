@@ -25,6 +25,9 @@ class ModerationRuleForm extends CFormModel {
 		return array(
 			array('projectId, type, level', 'required'),
 			array('projectId', 'length', 'is'=>24),
+
+			array('_id', 'required', 'on' => ModerationRuleForm::EDIT_RULE_SCENARIO),
+
 			array('level', 'numerical', 'integerOnly' => true),
 			array('level', 'Odd'),
 
@@ -39,5 +42,13 @@ class ModerationRuleForm extends CFormModel {
 
 	public function getModelClass() {
 		return 'ModerationRule';
+	}
+
+	public function populateFromModel(ModerationRuleModel $model) {
+		$this->level = $model->level;
+		$this->text = $model->text;
+		$this->type = $model->type;
+		$this->projectId = $model->projectId;
+		$this->_id = $model->_id;
 	}
 }

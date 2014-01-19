@@ -1,17 +1,15 @@
 <?php
-/**
- * User: dna
- * Date: 1/11/14
- * Time: 1:56 AM
- */
-
 class AdminController extends BaseProfileController {
 	public function getLoginUserRole() {
-		return UserIdentity::MODERATOR_ROLE;
+		return UserIdentity::ADMIN_ROLE;
 	}
 
+	public function getAfterLoginUrl() {
+
+	};
+
 	public function actionShowModeratorsList() {
-		$this->render('moderatorsList');
+		$this->render('showModeratorsList');
 	}
 
 	public function actionEditModeratorProfile() {
@@ -19,10 +17,18 @@ class AdminController extends BaseProfileController {
 	}
 
 	public function actionShowProjectsList() {
-		$this->render('projectsList');
+		$this->render('showProjectsList');
 	}
 
 	public function actionEditProjectProfile() {
 		$this->render('editProjectProfile');
+	}
+
+	public function actionShowModerationRulesList() {
+		$this->render('showProjectsList');
+	}
+
+	public function actionEditModerationRule() {
+		$this->render('editModerationRule');
 	}
 }

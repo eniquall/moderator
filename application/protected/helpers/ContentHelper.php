@@ -18,4 +18,9 @@ class ContentHelper {
 			self::CONTENT_TYPE_IMAGE_AND_TEXT => 'image with text'
 		);
 	}
+
+	public static function getTypeNameByType($type) {
+		$list = self::getAllowedTypesList();
+		return $list[$type];
+	}
 } 
