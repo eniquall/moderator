@@ -23,7 +23,8 @@ return array(
 		'application.models.forms.*',
 		'application.models.*',
 		'application.helpers.*',
-		'ext.ymds.*'
+		'ext.ymds.*',
+		'ext.PRFLR.*'
 	),
 	'modules' => array(
 		'gii' => array(
