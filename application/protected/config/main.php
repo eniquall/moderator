@@ -46,6 +46,7 @@ return array(
 			'urlFormat' => 'path',
 			'rules' => array(
 				'' => 'static/welcome',
+				'/api' => 'rest/index'
 			),
 			'showScriptName' => false,
 		),

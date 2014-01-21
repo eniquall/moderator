@@ -1,12 +1,12 @@
 <?php
-class AdminController extends BaseProfileController {
+class AdminController extends Controller {
 	public function getLoginUserRole() {
 		return UserIdentity::ADMIN_ROLE;
 	}
 
 	public function getAfterLoginUrl() {
-
-	};
+		return '';
+	}
 
 	public function actionShowModeratorsList() {
 		$this->render('showModeratorsList');
