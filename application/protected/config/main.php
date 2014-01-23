@@ -1,6 +1,6 @@
 <?php
 
-//date_default_timezone_set('@@TIMEZONE@@');
+date_default_timezone_set('Europe/Moscow');
 mb_internal_encoding("UTF-8");
 
 // add real time logging
@@ -69,6 +69,7 @@ return array(
 		'log' => array(
 			'class' => 'CLogRouter',
 			'routes' => array(
+/*
 				array(
 					'class' => 'application.extensions.PRFLR.PRFLRLogRoute',
 					'enabled' => true,
@@ -78,7 +79,7 @@ return array(
 								//'email'  => 'info@moderator.com',
 								//'pass'   => '1234567890'
 				),
-
+*/
 				array(
 					'class' => 'CWebLogRoute'
 				),
