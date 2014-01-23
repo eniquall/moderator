@@ -31,6 +31,14 @@ class WebUser extends CWebUser {
 		return $this->getState('role') == UserIdentity::MODERATOR_ROLE;
 	}
 
+	public function isAdmin() {
+		if ($this->isGuest) {
+			return false;
+		}
+
+		return $this->getState('role') == UserIdentity::ADMIN_ROLE;
+	}
+
 	/**
 	 * Methods return model of the current user
 	 * @return null|ModeratorModel

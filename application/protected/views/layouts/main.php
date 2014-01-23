@@ -30,16 +30,23 @@
 			'items'=>array(
 				array('label'=>'Home', 'url'=>array('')),
 				array('label'=>'About', 'url'=>array('/static/about')),
+
+				// moderator
 				array('label'=>'Moderator registration', 'url'=>array('/moderator/registration'), 'visible'=>Yii::app()->user->isGuest),
-				array('label'=>'Login for moderator', 'url'=>array('/moderator/login'), 'visible'=>Yii::app()->user->isGuest),
+				array('label'=>'Login as moderator', 'url'=>array('/moderator/login'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Edit moderator profile', 'url'=>array('/moderator/editProfile'), 'visible'=>Yii::app()->user->isModerator()),
 
+				// project
 				array('label'=>'Project registration', 'url'=>array('/project/registration'), 'visible'=>Yii::app()->user->isGuest),
-				array('label'=>'Login for project', 'url'=>array('/project/login'), 'visible'=>Yii::app()->user->isGuest),
+				array('label'=>'Login as project', 'url'=>array('/project/login'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Edit project profile', 'url'=>array('/project/editProfile'), 'visible'=>Yii::app()->user->isProject()),
 
 				array('label'=>'Add moderation rule', 'url' => array('/project/addModerationRule'), 'visible'=>Yii::app()->user->isProject()),
 				array('label'=>'Show moderation rules', 'url' => array('/project/showModerationRulesList'), 'visible'=>Yii::app()->user->isProject()),
+
+				// admin
+				array('label'=>'Show projects', 'url' => array('/admin/showProjectsList'), 'visible'=>Yii::app()->user->isAdmin()),
+				array('label'=>'Show moderators', 'url' => array('/admin/showModeratorsList'), 'visible'=>Yii::app()->user->isAdmin()),
 
 				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/moderator/logout'), 'visible'=>!Yii::app()->user->isGuest)
 			),
