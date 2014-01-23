@@ -17,30 +17,30 @@
 
 	<?php if ($model->getScenario() == ModerationRuleForm::EDIT_RULE_SCENARIO) {?>
 		<div class="row">
-			<?= $form->hiddenField($model, '_id'); ?>
+			<?php echo $form->hiddenField($model, '_id'); ?>
 		</div>
 	<? } ?>
 
 	<div class="row">
-		<?= $form->label($model, 'type', array('label' => $model->getAttributeLabel("type"))); ?>
-		<?= $form->dropdownList($model, 'type', ContentHelper::getAllowedTypesList()); ?>
-		<?= $form->error($model, 'type'); ?>
+		<?php echo $form->label($model, 'type', array('label' => $model->getAttributeLabel("type"))); ?>
+		<?php echo $form->dropdownList($model, 'type', ContentHelper::getAllowedTypesList()); ?>
+		<?php echo $form->error($model, 'type'); ?>
 	</div>
 
 	<div class="row">
-		<?= $form->label($model, 'text', array('label' => $model->getAttributeLabel("text"))); ?>
-		<?= $form->textArea($model, 'text'); ?>
-		<?= $form->error($model, 'text'); ?>
+		<?php echo $form->label($model, 'text', array('label' => $model->getAttributeLabel("text"))); ?>
+		<?php echo $form->textArea($model, 'text'); ?>
+		<?php echo $form->error($model, 'text'); ?>
 	</div>
 
 	<div class="row">
-		<?= $form->label($model, 'level', array('level' => $model->getAttributeLabel("level"))); ?>
-		<?= $form->textField($model, 'level', ContentHelper::getAllowedTypesList()); ?>
-		<?= $form->error($model, 'level'); ?>
+		<?php echo $form->label($model, 'level', array('level' => $model->getAttributeLabel("level"))); ?>
+		<?php echo $form->textField($model, 'level', ContentHelper::getAllowedTypesList()); ?>
+		<?php echo $form->error($model, 'level'); ?>
 	</div>
 
 	<div class="row">
-		<input type="submit" value="<?= $model->getScenario() == ModerationRuleForm::ADD_RULE_SCENARIO ? "Register" : "Edit"; ?>">
+		<input type="submit" value="<?php echo $model->getScenario() == ModerationRuleForm::ADD_RULE_SCENARIO ? "Register" : "Edit"; ?>">
 	</div>
 	<?php $this->endWidget(); ?>
 </div>
