@@ -19,7 +19,7 @@
 		<div class="row">
 			<?php echo $form->hiddenField($model, '_id'); ?>
 		</div>
-	<? } ?>
+	<?php } ?>
 
 	<div class="row">
 		<?php echo $form->label($model, 'name', array('label' => $model->getAttributeLabel("name"))); ?>

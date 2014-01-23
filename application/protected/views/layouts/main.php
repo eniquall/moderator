@@ -51,7 +51,7 @@
 			<div class="flash-success">
 				<?php echo $message; ?>
 			</div>
-		<? }
+		<?php }
 	} ?>
 
 	<?php $this->widget('zii.widgets.CBreadcrumbs', array(
