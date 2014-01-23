@@ -1,12 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
  * User: eniquall
  * Date: 1/14/14
  * Time: 11:39 PM
  */
 
 class ContentHelper {
+	/*
 	const CONTENT_TYPE_TEXT = 1;
 	const CONTENT_TYPE_IMAGE = 2;
 	const CONTENT_TYPE_IMAGE_AND_TEXT = 3;
@@ -23,4 +23,5 @@ class ContentHelper {
 		$list = self::getAllowedTypesList();
 		return $list[$type];
 	}
+	*/
 } 

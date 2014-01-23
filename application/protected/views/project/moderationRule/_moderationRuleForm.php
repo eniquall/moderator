@@ -23,7 +23,7 @@
 
 	<div class="row">
 		<?php echo $form->label($model, 'type', array('label' => $model->getAttributeLabel("type"))); ?>
-		<?php echo $form->dropdownList($model, 'type', ContentHelper::getAllowedTypesList()); ?>
+		<?php echo $form->textField($model, 'type'); ?>
 		<?php echo $form->error($model, 'type'); ?>
 	</div>
 
@@ -35,7 +35,7 @@
 
 	<div class="row">
 		<?php echo $form->label($model, 'level', array('level' => $model->getAttributeLabel("level"))); ?>
-		<?php echo $form->textField($model, 'level', ContentHelper::getAllowedTypesList()); ?>
+		<?php echo $form->textField($model, 'level'); ?>
 		<?php echo $form->error($model, 'level'); ?>
 	</div>
 

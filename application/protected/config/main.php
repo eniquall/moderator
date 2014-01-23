@@ -13,7 +13,7 @@ return array(
 
 	'sourceLanguage' => 'en',
 	'language' => 'en',
-
+	'defaultController' => 'static',
 	// preloading 'log' component
 	'preload' => array('log'),
 	// autoloading model and component classes

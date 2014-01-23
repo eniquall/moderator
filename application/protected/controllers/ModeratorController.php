@@ -11,7 +11,7 @@ class ModeratorController extends BaseProfileController {
 	}
 
 	public function init() {
-		Yii::app()->user->loginUrl = '/moderator/login';
+		Yii::app()->user->loginUrl = $this->createUrl('/moderator/login');
 	}
 
 	public function accessRules() {

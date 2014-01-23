@@ -11,13 +11,13 @@ class ProjectController extends BaseProfileController {
 	}
 
 	public function init() {
-		Yii::app()->user->loginUrl = '/project/login';
+		Yii::app()->user->loginUrl = $this->createUrl('/project/login');
 	}
 
 	public function accessRules() {
 		return array(
 			array('deny',
-				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule'),
+				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule', 'ShowModerationRulesList'),
 				'users'=>array('?'),
 			),
 			array('deny',

@@ -6,6 +6,8 @@
  */
 
 class StaticController extends Controller {
+	public $defaultAction = 'welcome';
+
 	public function actionWelcome() {
 		$this->render('welcome');
 	}

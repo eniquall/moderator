@@ -2,7 +2,7 @@
 
 <?php
 foreach ((array)$rules as $rule) {
-	echo "Type of content: " . ContentHelper::getTypeNameByType($rule->type) . "<br>";
+	echo "Type of content: " . $rule->type . "<br>";
 	echo "Text: " . $rule->text . "<br>";
 	echo "Level: " . $rule->level . "<br>";
 

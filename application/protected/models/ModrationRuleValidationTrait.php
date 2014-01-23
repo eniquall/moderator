@@ -15,6 +15,7 @@ trait ModrationRuleValidationTrait {
 		}
 	}
 
+	/*
 	public function TypeAllowed($attribute, $params) {
 		$type = $this->attributes[$attribute];
 
@@ -25,6 +26,7 @@ trait ModrationRuleValidationTrait {
 		}
 		return true;
 	}
+	*/
 
 	public function UniqueRule($attribute, $params) {
 		$type = $this->attributes[$attribute];
@@ -43,7 +45,7 @@ trait ModrationRuleValidationTrait {
 		}
 
 		if (ModerationRuleModel::model()->count($criteria)) {
-			$this->addError($attribute, 'Rule for this type of content for curfrent project exists already (' . $attribute . ') ');
+			$this->addError($attribute, 'Rule for this type of content for curfrent project exists already (' . $type . ') ');
 			return false;
 		}
 		return true;
