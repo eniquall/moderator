@@ -28,7 +28,8 @@ class WebUser extends CWebUser {
 			return false;
 		}
 
-		return $this->getState('role') == UserIdentity::MODERATOR_ROLE;
+		//admin - is a moderator with isSuperModerator flag
+		return ($this->getState('role') == UserIdentity::MODERATOR_ROLE) || ($this->getState('role') == UserIdentity::ADMIN_ROLE);
 	}
 
 	public function isAdmin() {

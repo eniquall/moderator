@@ -19,6 +19,10 @@ class ModeratorForm extends BaseProfileForm {
 	public $paypal;
 	public $_id;
 
+	public $notes;
+	public $isActive;
+	public $isSuperModerator;
+
 	public function rules() {
 		return array(
 			array('name, email, paypal', 'required'),
@@ -38,6 +42,9 @@ class ModeratorForm extends BaseProfileForm {
 
 			array('langs','type','type'=>'array','allowEmpty' => false, 'message' => 'Choose at least one language from the list'),
 			array('langs', 'LanguageAllowed', 'message' => 'One of the languages is not allowed'),
+
+			array('isActive, isSuperModerator', 'in', 'range' => [0,1]),
+			array('notes', 'length', 'max'=>1000),
 		);
 	}
 
@@ -58,6 +65,10 @@ class ModeratorForm extends BaseProfileForm {
 		$this->langs = $model->langs;
 		$this->paypal = $model->paypal;
 		$this->_id = $model->_id;
+
+		$this->notes = $model->notes;
+		$this->isActive = $model->isActive;
+		$this->isSuperModerator = $model->isSuperModerator;
 	}
 
 	public function getModelClass() {

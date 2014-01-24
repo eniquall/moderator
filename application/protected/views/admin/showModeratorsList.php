@@ -5,5 +5,7 @@ foreach($moderators as $moderator) {
 		$attributeValue = is_array($attributeValue) ? implode(', ', $attributeValue) : $attributeValue;
 		echo '<b>' . $attributeName . "</b> " . $attributeValue . "<br>";
 	}
+
+	echo "<a href='" . $this->createUrl('/moderator/editProfile', array('id' => $moderator->getId())) . "'>edit</a>";
 	echo "<br><hr>";
 }

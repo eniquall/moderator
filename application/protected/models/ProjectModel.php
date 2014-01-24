@@ -54,7 +54,8 @@ class ProjectModel extends CPModel {
 		// will receive user inputs.
 		return array(
 			array('email, name, password', 'required'),
-			array('balance, isActive', 'numerical', 'integerOnly'=>true),
+			array('isActive', 'numerical', 'integerOnly'=>true),
+			array('balance', 'numerical'),
 			array('isActive', 'in', 'range' => [0,1]),
 			array('apiKey, password', 'length', 'is'=>32, 'on' => BaseProfileForm::EDIT_PROFILE_SCENARIO),
 			array('email', 'uniqueEmail'),

@@ -16,6 +16,8 @@ class ProjectForm extends BaseProfileForm {
 	public $newPassword2;
 
 	public $isActive;
+	public $notes;
+	public $balance;
 
 	public function rules() {
 		return array(
@@ -34,6 +36,9 @@ class ProjectForm extends BaseProfileForm {
 			array('newPassword', 'length', 'min' => 6, 'on' => self::EDIT_PROFILE_SCENARIO),
 			array('newPassword2', 'compare', 'compareAttribute' => 'newPassword', 'on' => self::EDIT_PROFILE_SCENARIO),
 			array('isActive', 'in', 'range' => [0,1]),
+
+			array('notes', 'length', 'max'=>1000),
+			array('balance', 'numerical', 'min' => 0, 'on' => self::EDIT_PROFILE_SCENARIO),
 		);
 	}
 
@@ -50,6 +55,9 @@ class ProjectForm extends BaseProfileForm {
 		$this->name = $model->name;
 		$this->email = $model->email;
 		$this->_id = $model->_id;
+		$this->balance = $model->balance;
+		$this->notes = $model->notes;
+		$this->isActive = $model->isActive;
 	}
 
 	public function getModelClass() {

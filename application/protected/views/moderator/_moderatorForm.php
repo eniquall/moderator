@@ -5,7 +5,7 @@
 		'action' =>
 		($model->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO)
 			? Yii::app()->createUrl("/moderator/registration/")
-			: Yii::app()->createUrl("/moderator/editProfile/"),
+			: Yii::app()->createUrl("/moderator/editProfile/", array('id' => $model->_id)),
 		'enableClientValidation'=>true,
 		'clientOptions' => array(
 			'validateOnChange' => true,
@@ -30,6 +30,26 @@
 		<?php echo $form->textField($model, 'email', array('class' => 'shortField')); ?>
 		<?php echo $form->error($model, 'email'); ?>
 	</div>
+
+<?php if (Yii::app()->user->isAdmin()) {?>
+		<div class="row">
+			<?php echo $form->label($model, 'notes', array('label' => $model->getAttributeLabel("notes"))); ?>
+			<?php echo $form->textArea($model, 'notes', array('class' => 'longField')); ?>
+			<?php echo $form->error($model, 'notes'); ?>
+		</div>
+
+	<div class="row">
+		<?php echo $form->label($model, 'isActive', array('label' => $model->getAttributeLabel("isActive"))); ?>
+		<?php echo $form->checkbox($model, 'isActive', array('class' => 'shortField')); ?>
+		<?php echo $form->error($model, 'isActive'); ?>
+	</div>
+
+		<div class="row">
+			<?php echo $form->label($model, 'isSuperModerator', array('label' => $model->getAttributeLabel("isSuperModerator"))); ?>
+			<?php echo $form->checkbox($model, 'isSuperModerator', array('class' => 'shortField')); ?>
+			<?php echo $form->error($model, 'isSuperModerator'); ?>
+		</div>
+<?php } ?>
 
 	<div class="row">
 		<?php echo $form->label($model, 'password', array('label' => $model->getAttributeLabel("password"))); ?>

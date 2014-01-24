@@ -5,7 +5,7 @@
 		'action' =>
 		($model->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO)
 			? Yii::app()->createUrl("/project/registration/")
-			: Yii::app()->createUrl("/project/editProfile/"),
+			: Yii::app()->createUrl("/project/editProfile/", array('id' => $model->_id)),
 		'enableClientValidation'=>true,
 		'clientOptions' => array(
 			'validateOnChange' => true,
@@ -38,6 +38,20 @@
 		<?php echo $form->checkbox($model, 'isActive', array('class' => 'shortField')); ?>
 		<?php echo $form->error($model, 'isActive'); ?>
 	</div>
+
+<?php if (Yii::app()->user->isAdmin()) {?>
+	<div class="row">
+		<?php echo $form->label($model, 'notes', array('label' => $model->getAttributeLabel("notes"))); ?>
+		<?php echo $form->textArea($model, 'notes', array('class' => 'longField')); ?>
+		<?php echo $form->error($model, 'notes'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->label($model, 'balance', array('label' => $model->getAttributeLabel("balance"))); ?>
+		<?php echo $form->textField($model, 'balance', array('class' => 'longField')); ?>
+		<?php echo $form->error($model, 'balance'); ?>
+	</div>
+<?php } ?>
 
 	<div class="row">
 		<?php echo $form->label($model, 'password', array('label' => $model->getAttributeLabel("password"))); ?>

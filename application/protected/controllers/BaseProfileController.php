@@ -11,9 +11,9 @@ abstract class BaseProfileController extends Controller {
 		if (isset($_POST['LoginForm'])) {
 			$model->attributes = $_POST['LoginForm'];
 			if ($model->validate() && $model->login()) {
-				$returnUrl = !empty(Yii::app()->user->returnUrl)
-					? Yii::app()->user->returnUrl
-					: $this->getAfterLoginUrl();
+				$returnUrl = $this->getAfterLoginUrl()
+					? $this->getAfterLoginUrl()
+					: Yii::app()->user->returnUrl;
 				$this->redirect($returnUrl);
 			}
 		}
@@ -40,4 +40,19 @@ abstract class BaseProfileController extends Controller {
 		);
 	}
 
+	protected function _checkPermissionForEditProfile($id) {
+		if (Yii::app()->user->isAdmin()) {
+			return true;
+		}
+
+		// if you are trying to do something with profile and you are logged in as this profile
+		if (Yii::app()->user->role == $this->getLoginUserRole()) {
+			$profileModel = Yii::app()->user->getModel();
+			if ($profileModel->getId() === $id) {
+				return true;
+			}
+		}
+
+		throw new CHttpException(403, "You are trying to edit profile, but do not have permissions");
+	}
 } 

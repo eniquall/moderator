@@ -20,19 +20,22 @@ class ProjectController extends BaseProfileController {
 				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule', 'ShowModerationRulesList'),
 				'users'=>array('?'),
 			),
-			array('deny',
-				'actions'=>array('Registration'),
-				'users'=>array('@'),
-			),
+//			array('deny',
+//				'actions'=>array('Registration'),
+//				'users'=>array('@'),
+//			),
 			array('allow',
-				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule'),
+				'actions'=>array('Registration', 'EditProfile', 'AddModerationRule', 'EditModerationRule'),
 				'roles'=>array(UserIdentity::PROJECT_ROLE, UserIdentity::ADMIN_ROLE),
 			),
 		);
 	}
 
 	public function getAfterLoginUrl() {
-		return $this->createUrl('/project/addModerationRule');
+		if (Yii::app()->user->isAdmin()) {
+			return $this->createUrl('/admin/showProjectsList');
+		}
+		return $this->createUrl('/project/showModerationRulesList');
 	}
 
 	public function actionRegistration() {
@@ -40,7 +43,7 @@ class ProjectController extends BaseProfileController {
 		if (isset($_POST['ProjectForm'])) {
 			$model->attributes = $_POST['ProjectForm'];
 			if ($model->validate()) {
-				if ($this->_saveProjectProfile($model)) {
+				if ($this->_saveProjectProfile($model, new ProjectModel())) {
 					$this->redirect($this->getAfterLoginUrl());
 				}
 			}
@@ -48,21 +51,24 @@ class ProjectController extends BaseProfileController {
 		$this->render('registration', array('model' => $model));
 	}
 
-	public function actionEditProfile() {
+	public function actionEditProfile($id) {
 		$formModel = new ProjectForm(BaseProfileForm::EDIT_PROFILE_SCENARIO);
+		$this->_checkPermissionForEditProfile($id);
+		$project = ProjectModel::model()->findByPk(new MongoId($id));
+
+		if (empty($project)) {
+			throw new CException(404, 'Profile with this id was not found');
+		}
 
 		if (isset($_POST['ProjectForm'])) {
 			$formModel->attributes = $_POST['ProjectForm'];
 			if ($formModel->validate()) {
-				// register
-
-				if ($this->_saveProjectProfile($formModel)) {
+				if ($this->_saveProjectProfile($formModel, $project)) {
 					$this->redirect($this->getAfterLoginUrl());
 				}
 			}
 		} else {
-			$moderator = Yii::app()->user->getModel();
-			$formModel->populateFromModel($moderator);
+			$formModel->populateFromModel($project);
 		}
 
 		$this->render('editProfile', array('model' => $formModel));
@@ -133,32 +139,36 @@ class ProjectController extends BaseProfileController {
 		$this->render('moderationRule/showList', array('rules' => $rules, 'project' => $project));
 	}
 
-	protected function _saveProjectProfile(ProjectForm $formModel) {
-		$project = null;
+	/**
+	 * Method for edit project profile - checks for permissions to do that should be performed
+	 * before that method! (in action)
+	 * @param ProjectForm $formModel
+	 * @param ProjectModel $project
+	 * @return bool
+	 */
+	protected function _saveProjectProfile(ProjectForm $formModel, ProjectModel $project) {
 		if ($formModel->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {
-			if ((Yii::app()->user->getId() != $formModel->_id) || (Yii::app()->user->role != UserIdentity::PROJECT_ROLE)) {
-				throw new CHttpException(403, "You are trying to edit profile, but not loggged in as project administrator");
-			} else {
-				$project = Yii::app()->user->getModel();
-				// save new password if it was entered
-				// additional validations were performed with ModeratorForm validations (checkForNewPassword)
-				if (!empty($formModel->newPassword)) {
-					$project->password = SecurityHelper::generatePasswordHash($formModel->newPassword);
-				}
+			// save new password if it was entered
+			// additional validations were performed with ProjectForm validations (checkForNewPassword)
+			if (!empty($formModel->newPassword)) {
+				$project->password = SecurityHelper::generatePasswordHash($formModel->newPassword);
 			}
 		} else if ($formModel->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO) {
-			$project = new ProjectModel();
+			//there should be new ProjectModel
 			// save md5 hash of password
 			$project->password = SecurityHelper::generatePasswordHash($formModel->password);
 		}
 
 		$project->setScenario($formModel->getScenario());
 
+		// only admin can change these vaues
+		if (Yii::app()->user->isAdmin()) {
+			$project->balance = $formModel->balance;
+			$project->notes = $formModel->notes;
+		}
+
 		$project->name  = $formModel->name;
 		$project->email = mb_strtolower($formModel->email);
-		$project->balance = 0;
-		$project->notes = '';
-		// @TODO clarify if project should be active instantly after registration
 		$project->isActive = $formModel->isActive;
 
 		$result = $project->save();
@@ -172,7 +182,8 @@ class ProjectController extends BaseProfileController {
 
 		if ($formModel->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO) {
 
-			//enable validation rules for apiKey
+			//enable validation rules for apiKey - as we already saved (registered project)
+			//have to set EDIT_PROFILE_SCENARIO
 			$project->setScenario(BaseProfileForm::EDIT_PROFILE_SCENARIO);
 			$project->apiKey = SecurityHelper::generateApiKey($project->email, $project->_id);
 			$result = $project->save();

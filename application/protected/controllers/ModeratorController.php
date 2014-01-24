@@ -32,63 +32,65 @@ class ModeratorController extends BaseProfileController {
 	}
 
 	public function getAfterLoginUrl(){
+		if (Yii::app()->user->isAdmin()) {
+			return $this->createUrl('/admin/showModeratorsList');
+		}
 		return $this->createUrl('/moderator/moderate');
 	}
 
 	public function actionRegistration() {
-		$model = new ModeratorForm(BaseProfileForm::REGISTRATION_SCENARIO);
+		$formModel = new ModeratorForm(BaseProfileForm::REGISTRATION_SCENARIO);
+
 		if (isset($_POST['ModeratorForm'])) {
-			$model->attributes = $_POST['ModeratorForm'];
-			if ($model->validate()) {
-				if ($this->_saveModeratorProfile($model)) {
+			$formModel->attributes = $_POST['ModeratorForm'];
+			if ($formModel->validate()) {
+				if ($this->_saveModeratorProfile($formModel, new ModeratorModel())) {
 					$this->redirect($this->getAfterLoginUrl());
 				}
 			}
 		}
-		$this->render('registration', array('model' => $model));
+		$this->render('registration', array('model' => $formModel));
 	}
 
 	/**
 	 * Edit profile of the current moderator
 	 */
-	public function actionEditProfile() {
+	public function actionEditProfile($id) {
 		$formModel = new ModeratorForm(BaseProfileForm::EDIT_PROFILE_SCENARIO);
+
+		$this->_checkPermissionForEditProfile($id);
+		$moderator = ModeratorModel::model()->findByPk(new MongoId($id));
+
+		if (empty($moderator)) {
+			throw new CException(404, 'Profile with this id was not found');
+		}
 
 		if (isset($_POST['ModeratorForm'])) {
 
 			$formModel->attributes = $_POST['ModeratorForm'];
 			if ($formModel->validate()) {
-				// register
-
-				if ($this->_saveModeratorProfile($formModel)) {
-					$this->redirect('/moderator/moderate');
+				if ($this->_saveModeratorProfile($formModel, $moderator)) {
+					$this->redirect($this->getAfterLoginUrl());
 				}
 			}
 		} else {
-			$moderator = Yii::app()->user->getModel();
 			$formModel->populateFromModel($moderator);
 		}
 
 		$this->render('editProfile', array('model' => $formModel));
 	}
 
-	public function _saveModeratorProfile(ModeratorForm $formModel) {
-		$moderator = null;
+	public function _saveModeratorProfile(ModeratorForm $formModel, ModeratorModel $moderator) {
 		if ($formModel->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {
-			if ((Yii::app()->user->getId() != $formModel->_id) || (Yii::app()->user->role != UserIdentity::MODERATOR_ROLE)) {
-				throw new CHttpException(403, "You are trying to edit profile, but not loggged in");
-			} else {
-				$moderator = Yii::app()->user->getModel();
-				// save new password if it was entered
-				// additional validations were performed with ModeratorForm validations (checkForNewPassword)
-				if (!empty($formModel->newPassword)) {
-					$moderator->password = SecurityHelper::generatePasswordHash($formModel->newPassword);
-				}
+			// save new password if it was entered
+			// additional validations were performed with ModeratorForm validations (checkForNewPassword)
+			if (!empty($formModel->newPassword)) {
+				$moderator->password = SecurityHelper::generatePasswordHash($formModel->newPassword);
 			}
 		} else if ($formModel->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO){
-			$moderator = new ModeratorModel();
 			// save md5 hash of password
 			$moderator->password = SecurityHelper::generatePasswordHash($formModel->password);
+			$moderator->createDate = time();
 		}
 
 		$moderator->setScenario($formModel->getScenario());
@@ -99,6 +101,12 @@ class ModeratorController extends BaseProfileController {
 		$moderator->langs  = $formModel->langs;
 		$moderator->paypal = $formModel->paypal;
 
+		//fields can be changed by admin only
+		if (Yii::app()->user->isAdmin()) {
+			$moderator->notes = $formModel->notes;
+			$moderator->isActive = $formModel->isActive;
+			$moderator->isSuperModerator = $formModel->isSuperModerator;
+		}
 
 		$result = $moderator->save();
 		if (!$result) {

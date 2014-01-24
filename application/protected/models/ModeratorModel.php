@@ -8,7 +8,7 @@ class ModeratorModel extends CPModel {
 	public $password;
 	
 	public $langs;
-	public $projects;
+	public $projectIds;
 	public $paypal;
 	
 	public $notes;

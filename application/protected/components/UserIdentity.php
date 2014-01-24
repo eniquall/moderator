@@ -23,15 +23,10 @@ class UserIdentity extends CUserIdentity
 		$userModelClass = $this->getModelClass();
 		$userModel = new $userModelClass;
 
-		$user = $userModel::model()->find(
-			array(
-				'conditions' => array(
-					'email' => array(
-						'==' => $this->username
-					)
-				)
-			)
-		);
+		$criteria = new EMongoCriteria();
+		$criteria->email = $this->username;
+
+		$user = $userModel::model()->find($criteria);
 
 		if ($user === null) {
 			$this->errorCode = self::ERROR_USERNAME_INVALID;
@@ -44,6 +39,11 @@ class UserIdentity extends CUserIdentity
 			$this->email = $user->email;
 			$this->errorCode = self::ERROR_NONE;
 		}
+
+		if ($this->getRole() == self::MODERATOR_ROLE && $user->isSuperModerator == "1") {
+			$this->setRole(self::ADMIN_ROLE);
+		}
+
 		return $this->errorCode == self::ERROR_NONE;
 	}
 
