@@ -5,7 +5,7 @@
  */
 class ContentModel extends CPModel {
 	public $_id;
-	public $uid;
+	public $id; // external contentId
 	public $projectId;
 	public $type;
 	public $lang;
@@ -14,7 +14,7 @@ class ContentModel extends CPModel {
 	public $result;
 	public $isDelivered;
 	public $stat;
-	public $createdDate;
+	public $addedDate;
 	public $checkedDate;
 	public $resultDate;
 
@@ -56,17 +56,17 @@ class ContentModel extends CPModel {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('uid, projectId, type, lang, createdDate', 'required'),
+			array('id, projectId, type, lang, addedDate', 'required'),
 			array('result, isDelivered', 'numerical', 'integerOnly'=>true),
 			array('isDelivered', 'in', 'range' => [0,1]),
-			array('uid', 'length', 'max'=>100),
-			array('type, data, context, stat', 'length', 'max'=>45),
-			array('projectId', 'length', 'is'=>24),
+			array('id', 'length', 'max'=>100),
+			array('type, stat', 'length', 'max'=>45),
+			array('projectId', 'isProjectExists'),
 			array('lang', 'length', 'max'=>2),
 			array('checkedDate, resultDate', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('_id, uid, project, type, lang, data, context, result, isDelivered, stat, createdDate, checkedDate, resultDate', 'safe', 'on'=>'search'),
+			array('_id, id, project, projectId, type, lang, data, context, result, isDelivered, stat, addedDate, checkedDate, resultDate', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -77,7 +77,7 @@ class ContentModel extends CPModel {
 	{
 		return array(
 			'_id' => 'ID',
-			'uid' => 'Uid',
+			'id' => 'id',
 			'projectId' => 'Project Id',
 			'type' => 'Type',
 			'lang' => 'Lang',
@@ -86,9 +86,20 @@ class ContentModel extends CPModel {
 			'result' => 'Result',
 			'isDelivered' => 'Is Delivered',
 			'stat' => 'Stat',
-			'createdDate' => 'Created Date',
+			'addedDate' => 'Added Date',
 			'checkedDate' => 'Checked Date',
 			'resultDate' => 'Result Date',
 		);
+	}
+
+	public function isProjectExists ($attribute, $params) {
+		$projectId = $this->attributes[$attribute];
+		$project = ProjectModel::model()->findByPk(new MongoId($projectId));
+
+		if (empty($project)) {
+			$this->addError($attribute, 'Project with id  ' . $projectId . ' doesn\'t exists');
+		}
+
+		return !empty($project);
 	}
 }

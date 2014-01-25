@@ -28,12 +28,13 @@ class RestController extends Controller{
 	 *
 	 *
 	 * http://moderator.local/api/?apiKey=12344567890&data={}
+	 * http://moderator.local/?r=rest/index/apiKey/4bfa4f88d767379953074aed37f140e4/data/{}
 	 */
 	public function actionIndex($apiKey, $data) {
 		$data = <<<DATA
 [{
 "id": "123",
-"projectId": "70fdf952f7fb67e5177121b9d1530d73",
+"projectId": "52d5db281e483cdb1d8b4567",
 "type": "profile",
 "lang": "ru",
 "data": [
@@ -62,12 +63,12 @@ DATA;
 				$this->_addContent($contentByUser);
 			}
 		}
-		$moderatedContent = $this->_getModeratedContentByProject();
+		$moderatedContent = $this->_getModeratedContentByProject($project->_id);
 		$this->_respond(200, 'ok', $moderatedContent);
 	}
 
-	protected function _respond() {
-
+	protected function _respond($code, $status, $moderatedContent) {
+		echo CJSON::encode($moderatedContent);
 	}
 
 	public function getProjectByApiKey($apiKey) {
@@ -97,30 +98,61 @@ DATA;
 			return false;
 			//$this->_generateError(500, 'Check your data request format. id, projectId, type, data are required, data - is an array');
 		}
+		return true;
 	}
 
-	protected function _addContent(stdClass $contentByUser) {
+	protected function _addContent($contentByUser) {
+		$contentModel = new ContentModel();
+//		foreach($contentByUser['data'] as $contentType => $contentValue) {
+//			$contentModel->
+//		}
 
-		foreach($contentByUser->data as $contentType => $contentValue) {
-			//img, text ...
-//			switch ($contentType) {
-//				case ContentHelper::CONTENT_TYPE_TEXT:
-//					break;
-//
-//				case ContentHelper::CONTENT_TYPE_IMAGE:
-//					break;
-//
-//				case ContentHelper::CONTENT_TYPE_IMAGE_AND_TEXT:
-//					break;
-//
-//				default:
-//			}
+		$contentModel->data = $contentByUser['data'];
+		$contentModel->id = $contentByUser['id'];
+		$contentModel->projectId = $contentByUser['projectId'];
+		$contentModel->type = $contentByUser['type']; // check type
+		$contentModel->lang = $contentByUser['lang']; // check
 
-			// in_array()
-		}
+		$contentModel->context = $contentByUser['context']; // check
+
+		$contentModel->lang = $contentByUser['lang']; // check
+		$contentModel->isDelivered = 0; // check
+		$contentModel->addedDate = time(); // check
+
+/*
+		public $_id;
+		public $uid;
+		public $projectId;
+		public $type;
+		public $lang;
+		public $data;
+		public $context;
+		public $result;
+		public $isDelivered;
+		public $stat;
+		public $addedDate;
+		public $checkedDate;
+		public $resultDate;
+
+● _id : mongoID
+● uid: string
+● project:string
+● type:string
+● lang:string
+● data: [ ]
+● context: [ ]
+● reason: bool  [0,1] ­ финальный результат голосования
+● delivery: bool [0,1] ­ флаг доставки результата модерирования клиенту
+● stat: [ ]  ­ перечень модераторов которые модерировали этот контент с их апрувами
+● adddate: timestamp  ­ дата добавления
+● checkdate: timestamp ­ дата поступления контента на модерацию к конкретному
+модератору
+● reasondate: timestamp  ­ дата вынесения апрува
+		*/
+		return $contentModel->save();
 	}
 
-	protected function _getModeratedContentByProject() {
+	protected function _getModeratedContentByProject($projectId) {
 		return true;
 	}
 }
