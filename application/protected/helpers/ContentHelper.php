@@ -54,4 +54,11 @@ class ContentHelper {
 		);
 		return $rule;
 	}
+
+	public function getContentForModeration($moderatorId) {
+		$content = ContentModel::model()->findByAttributes(
+			array(''=>'')
+		);
+
+	}
 } 

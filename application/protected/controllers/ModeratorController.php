@@ -122,6 +122,16 @@ class ModeratorController extends BaseProfileController {
 	 * The main action for moderating content
 	 */
 	public function actionModerate() {
-		$this->render('moderate');
+		$moderatorId = Yii::app()->user->getId();
+		$content = ContentHelper::getContentForModeration($moderatorId);
+
+		$moderationRule = ContentHelper::getModerationRuleByProjectAndTypeName($content->projectId, $content->type)
+		$this->render('moderate',
+			array(
+				'content' => $content,
+				'moderationRule' => $moderationRule,
+
+			)
+		);
 	}
 }
