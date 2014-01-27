@@ -30,6 +30,7 @@ class ModerationRuleForm extends CFormModel {
 
 			array('level', 'numerical', 'integerOnly' => true),
 			array('level', 'Odd'),
+			array('level', 'in', 'range' => [1,3,5,7,9]),
 
 			//array('type', 'TypeAllowed', 'message' => 'Content type is not allowed'),
 			array('type', 'UniqueRule', 'You already have rule of this type'),

@@ -1,6 +1,13 @@
 <?php
 echo __FILE__;
 
+if (empty($content)) {
+	echo "Sorry there are no content to moderate for you now.";
+} else {
+?>
+
+
+
 
 <table>
 <tr>
@@ -17,3 +24,6 @@ echo __FILE__;
 </tr>
 
 </table>
+
+
+<?php } ?>

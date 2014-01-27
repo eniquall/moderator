@@ -118,6 +118,9 @@ DATA;
 		$contentModel->lang = $contentByUser['lang']; // check
 		$contentModel->isDelivered = 0; // check
 		$contentModel->addedDate = time(); // check
+		$contentModel->checkDate = 0; // should be set as we will try to find content with cond: > time() - 3 * 60
+		// reason shouldn't be set here
+
 
 /*
 		public $_id;
@@ -127,12 +130,12 @@ DATA;
 		public $lang;
 		public $data;
 		public $context;
-		public $result;
+		public $reason;
 		public $isDelivered;
 		public $stat;
 		public $addedDate;
 		public $checkedDate;
-		public $resultDate;
+		public $reasonDate;
 
 ● _id : mongoID
 ● uid: string

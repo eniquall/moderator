@@ -84,11 +84,13 @@
 		<?php echo $form->error($model, 'langs'); ?>
 	</div>
 
+<?php if ($model->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {?>
 	<div class="row">
 		<?php echo $form->label($model, 'paypal', array('label' => $model->getAttributeLabel("paypal"))); ?>
 		<?php echo $form->textField($model, 'paypal', array('class' => 'shortField')); ?>
 		<?php echo $form->error($model, 'paypal'); ?>
 	</div>
+<? } ?>
 
 	<div class="row">
 		<input type="submit" value="<?php echo  $model->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO ? "Register" : "Edit"; ?>">

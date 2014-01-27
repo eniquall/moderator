@@ -62,7 +62,7 @@ class ModeratorModel extends CPModel {
 	public function rules() 
 	{
 		return array(
-			array('name, email, password, langs, paypal', 'required'),
+			array('name, email, password, langs', 'required'),
 			array('email', 'uniqueEmail'),
 			array('isActive, isSuperModerator', 'in', 'range' => [0,1]),
 

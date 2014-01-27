@@ -35,7 +35,7 @@ class ModeratorController extends BaseProfileController {
 		if (Yii::app()->user->isAdmin()) {
 			return $this->createUrl('/admin/showModeratorsList');
 		}
-		return $this->createUrl('/moderator/moderate');
+		return $this->createUrl('/static/about');
 	}
 
 	public function actionRegistration() {
@@ -87,6 +87,8 @@ class ModeratorController extends BaseProfileController {
 			if (!empty($formModel->newPassword)) {
 				$moderator->password = SecurityHelper::generatePasswordHash($formModel->newPassword);
 			}
+			$moderator->paypal = $formModel->paypal;
+
 		} else if ($formModel->getScenario() == BaseProfileForm::REGISTRATION_SCENARIO){
 			// save md5 hash of password
 			$moderator->password = SecurityHelper::generatePasswordHash($formModel->password);
@@ -99,7 +101,6 @@ class ModeratorController extends BaseProfileController {
 		$moderator->email = mb_strtolower($formModel->email);
 
 		$moderator->langs  = $formModel->langs;
-		$moderator->paypal = $formModel->paypal;
 
 		//fields can be changed by admin only
 		if (Yii::app()->user->isAdmin()) {
@@ -123,14 +124,17 @@ class ModeratorController extends BaseProfileController {
 	 */
 	public function actionModerate() {
 		$moderatorId = Yii::app()->user->getId();
+		$moderationRule = null;
 		$content = ContentHelper::getContentForModeration($moderatorId);
 
-		$moderationRule = ContentHelper::getModerationRuleByProjectAndTypeName($content->projectId, $content->type)
+		if ($content) {
+			$moderationRule = ContentHelper::getModerationRuleByProjectAndTypeName($content->projectId, $content->type);
+		}
+
 		$this->render('moderate',
 			array(
 				'content' => $content,
-				'moderationRule' => $moderationRule,
-
+				'moderationRule' => $moderationRule
 			)
 		);
 	}

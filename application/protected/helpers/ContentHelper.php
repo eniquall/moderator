@@ -55,10 +55,37 @@ class ContentHelper {
 		return $rule;
 	}
 
-	public function getContentForModeration($moderatorId) {
-		$content = ContentModel::model()->findByAttributes(
-			array(''=>'')
-		);
+	public static function getContentForModeration($moderatorId) {
+		$moderator = ModeratorModel::model()->findByPk(new MongoId($moderatorId));
 
+		$criteria = new EMongoCriteria();
+		// if it's regular moderator - add langs list to criteria
+		// supermoderator can moderate content with any language
+
+		if ($moderator->isSuperModerator != "1") {
+			$criteria->lang = ['in' => $moderator->langs];
+		}
+
+		// content doesn't have final status
+		$criteria->reason = ['notExists'];
+		$criteria->checkDate = ['>' => time() + 3 * 60]; // last check attempt was more than 3 minutes ago
+		$criteria->offset(20);
+		//according to task
+
+		$content = ContentModel::model()->find($criteria);
+
+
+		// get one item from array (sort them by projects)
+		if (count($content) > 1) {
+			$contentItem = reset($content);
+		} else {
+			$contentItem = $content;
+		}
+
+		// set check time - so other moderator will not take it at the same time
+		$contentItem->checkDate = time();
+		$contentItem->save();
+
+		return $contentItem;
 	}
-} 
+}

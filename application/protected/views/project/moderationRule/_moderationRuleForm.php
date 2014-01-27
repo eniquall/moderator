@@ -35,7 +35,7 @@
 
 	<div class="row">
 		<?php echo $form->label($model, 'level', array('level' => $model->getAttributeLabel("level"))); ?>
-		<?php echo $form->textField($model, 'level'); ?>
+		<?php echo $form->dropDownList($model, 'level', [1,3,5,7,9]); ?>
 		<?php echo $form->error($model, 'level'); ?>
 	</div>
 

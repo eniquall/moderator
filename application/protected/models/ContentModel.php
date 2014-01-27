@@ -11,12 +11,12 @@ class ContentModel extends CPModel {
 	public $lang;
 	public $data;
 	public $context;
-	public $result;
+	public $reason;
 	public $isDelivered;
 	public $stat;
 	public $addedDate;
 	public $checkedDate;
-	public $resultDate;
+	public $reasonDate;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -57,16 +57,16 @@ class ContentModel extends CPModel {
 		// will receive user inputs.
 		return array(
 			array('id, projectId, type, lang, addedDate', 'required'),
-			array('result, isDelivered', 'numerical', 'integerOnly'=>true),
+			array('reason, isDelivered', 'numerical', 'integerOnly'=>true),
 			array('isDelivered', 'in', 'range' => [0,1]),
 			array('id', 'length', 'max'=>100),
 			array('type, stat', 'length', 'max'=>45),
 			array('projectId', 'isProjectExists'),
 			array('lang', 'length', 'max'=>2),
-			array('checkedDate, resultDate', 'safe'),
+			array('checkedDate, reasonDate', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('_id, id, project, projectId, type, lang, data, context, result, isDelivered, stat, addedDate, checkedDate, resultDate', 'safe', 'on'=>'search'),
+			array('_id, id, project, projectId, type, lang, data, context, reason, isDelivered, stat, addedDate, checkedDate, reasonDate', 'safe', 'on'=>'search'),
 		);
 	}
 

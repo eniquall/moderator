@@ -37,6 +37,7 @@
 				// moderator
 				array('label'=>'Moderator registration', 'url'=>array('/moderator/registration'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Login as moderator', 'url'=>array('/moderator/login'), 'visible'=>Yii::app()->user->isGuest),
+				array('label'=>'Moderate content', 'url'=>$this->createUrl('/moderator/moderate'), 'visible'=>Yii::app()->user->isModerator()),
 				array('label'=>'Edit moderator profile', 'url'=>$this->createUrl('/moderator/editProfile', array('id' => Yii::app()->user->getId())), 'visible'=>Yii::app()->user->isModerator()),
 
 				// project

@@ -11,6 +11,7 @@ abstract class BaseProfileController extends Controller {
 		if (isset($_POST['LoginForm'])) {
 			$model->attributes = $_POST['LoginForm'];
 			if ($model->validate() && $model->login()) {
+				Yii::app()->user->setFlash('success', 'Logging in successfully');
 				$returnUrl = $this->getAfterLoginUrl()
 					? $this->getAfterLoginUrl()
 					: Yii::app()->user->returnUrl;
