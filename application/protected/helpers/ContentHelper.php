@@ -38,20 +38,11 @@ class ContentHelper {
 	}
 
 	public static function getModerationRuleByProjectAndTypeName($projectId, $ruleTypeName) {
-		$rule = new ModerationRuleModel();
-		$rule->projectId = $projectId;
-		$rule->type = $ruleTypeName;
-		$rule->search(false); // caseSensitivity = false;
+		$criteria = new EMongoCriteria();
+		$criteria->projectId = $projectId;
+		$criteria->type = new MongoRegex('/' . trim($ruleTypeName) . '/i');
+		$rule = ModerationRuleModel::model()->find($criteria);
 
-		return $rule->getData();
-
-
-		$rule = ModerationRuleModel::model()->findByAttributes(
-			array(
-				'projectId'	=> $projectId,
-				'type'		=> $ruleTypeName
-			)
-		);
 		return $rule;
 	}
 
@@ -63,27 +54,37 @@ class ContentHelper {
 		// supermoderator can moderate content with any language
 
 		if ($moderator->isSuperModerator != "1") {
-			$criteria->lang = ['in' => $moderator->langs];
+			$langs = [];
+			$allowedLangsList = LanguagesHelper::getAllowedLanguagesList();
+
+			foreach($moderator->langs as $lang) {
+				$langs[] = $allowedLangsList[$lang];
+			}
+
+			$criteria->addCond('lang', 'in', $langs);
 		}
 
 		// content doesn't have final status
-		$criteria->reason = ['notExists'];
-		$criteria->checkDate = ['>' => time() + 3 * 60]; // last check attempt was more than 3 minutes ago
+		$criteria->addCond('reason', 'notexists', '');
+	//	$criteria->addCond('checkedDate', '<', time() - 3 * 60); // last check attempt was more than 3 minutes ago
 		$criteria->offset(20);
 		//according to task
 
 		$content = ContentModel::model()->find($criteria);
-
+		if (empty($content)) {
+			return null;
+		}
 
 		// get one item from array (sort them by projects)
 		if (count($content) > 1) {
+			// @TODO implement some filtration
 			$contentItem = reset($content);
 		} else {
 			$contentItem = $content;
 		}
 
 		// set check time - so other moderator will not take it at the same time
-		$contentItem->checkDate = time();
+		$contentItem->checkedDate = time();
 		$contentItem->save();
 
 		return $contentItem;

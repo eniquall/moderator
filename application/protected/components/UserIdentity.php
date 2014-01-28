@@ -40,7 +40,7 @@ class UserIdentity extends CUserIdentity
 			$this->errorCode = self::ERROR_NONE;
 		}
 
-		if ($this->getRole() == self::MODERATOR_ROLE && $user->isSuperModerator == "1") {
+		if ($this->getRole() == self::MODERATOR_ROLE && $user && $user->isSuperModerator == "1") {
 			$this->setRole(self::ADMIN_ROLE);
 		}
 

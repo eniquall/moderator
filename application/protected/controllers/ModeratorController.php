@@ -130,10 +130,12 @@ class ModeratorController extends BaseProfileController {
 		if ($content) {
 			$moderationRule = ContentHelper::getModerationRuleByProjectAndTypeName($content->projectId, $content->type);
 		}
+		$project = ProjectModel::model()->findByPk(new MongoId($content->projectId));
 
 		$this->render('moderate',
 			array(
 				'content' => $content,
+				'project' => $project,
 				'moderationRule' => $moderationRule
 			)
 		);

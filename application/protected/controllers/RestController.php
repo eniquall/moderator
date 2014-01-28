@@ -31,22 +31,58 @@ class RestController extends Controller{
 	 * http://moderator.local/?r=rest/index/apiKey/4bfa4f88d767379953074aed37f140e4/data/{}
 	 */
 	public function actionIndex($apiKey, $data) {
+//		$data = <<<DATA
+//[{
+//"id": "123",
+//"projectId": "52d5db281e483cdb1d8b4567",
+//"type": "profile",
+//"lang": "ru",
+//"data": [
+//    {"img": "http://www.bacuseventos.es/portal/contenidos/images/tmp2/565/automotivo-wall-papers-show-som-e-laser-248533_20130725132548.jpg" },
+//    {"text": "show time!!!"}
+//],
+//"context": [
+//    {"text": "Amsterdam 2014"},
+//    {"text": "yeee-hooO!"}
+//]
+//}]
+//DATA;
+//		$data = <<<DATA
+//		[{
+//			"id": "123",
+//"projectId": "52d5db281e483cdb1d8b4567",
+//"type": "profile",
+//"lang": "ru",
+//"data": [
+//    {"img": "http://mutuamatheka.files.wordpress.com/2011/02/23_sun_dance_1600-1280.jpg" },
+//    {"text": "down!!!"}
+//],
+//"context": [
+//    {"text": "Bali 2015"},
+//    {"text": "the best vacation ever!!!111"}
+//]
+//}]
+//DATA;
+
+
 		$data = <<<DATA
-[{
-"id": "123",
-"projectId": "52d5db281e483cdb1d8b4567",
-"type": "profile",
-"lang": "ru",
+		[{
+			"id": "256",
+"projectId": "52d5dda01e483cdb1d8b4569",
+"type": "photoWithName",
+"lang": "ch",
 "data": [
-    {"img": "url" },
-    {"text": "я стою на утесе и машу писей ветру!!!"}
+    {"img": "http://undergroundwebworld.com/Images%20Art/storm.jpg" },
+    {"text": "bad weather"}
 ],
 "context": [
-    {"text": "Василий,25"},
-    {"text": "12 жалоб"}
+    {"text": "Photo from album 'Nature'"},
+    {"text": "bgf"}
 ]
 }]
 DATA;
+
+		//http://static.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/1/28/1359391807703/Light-Show-exhibition-at--010.jpg
 
 		$project = $this->getProjectByApiKey($apiKey);
 
@@ -110,15 +146,13 @@ DATA;
 		$contentModel->data = $contentByUser['data'];
 		$contentModel->id = $contentByUser['id'];
 		$contentModel->projectId = $contentByUser['projectId'];
-		$contentModel->type = $contentByUser['type']; // check type
-		$contentModel->lang = $contentByUser['lang']; // check
-
+		$contentModel->type = $contentByUser['type']; // check type ?
+		$contentModel->lang = mb_strtolower($contentByUser['lang']); // check
 		$contentModel->context = $contentByUser['context']; // check
-
 		$contentModel->lang = $contentByUser['lang']; // check
 		$contentModel->isDelivered = 0; // check
 		$contentModel->addedDate = time(); // check
-		$contentModel->checkDate = 0; // should be set as we will try to find content with cond: > time() - 3 * 60
+		$contentModel->checkedDate = 0; // should be set as we will try to find content with cond: > time() - 3 * 60
 		// reason shouldn't be set here
 
 
