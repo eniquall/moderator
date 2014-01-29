@@ -123,6 +123,25 @@ class ModeratorController extends BaseProfileController {
 	 * The main action for moderating content
 	 */
 	public function actionModerate() {
+		
+		/*
+		if (isset($_POST['moderateForm[contentId]'], $_POST['moderateForm[approveResult]'])) {
+			$contentId = $_POST['moderateForm[contentId]'];
+			$approveResult = $_POST['moderateForm[approveResult]'];
+
+			$content = ContentModel::model()->findByPk(new MongoId($contentId));
+			if (empty($content)) {
+				Yii::log(__METHOD__ . ' Content with id ' . $contentId . 'was not found' , CLogger::LEVEL_ERROR);
+				$this->redirect('/moderator/moderate'); // redirect to page without POST params to avoid multi approve actions
+			}
+			//check if moderator can work with this content
+			$moderator = Yii::app()->user->getModel();
+			$this->_checkIfModeratorCanModerate($content, $moderator);
+
+			// save mark ...
+		}
+		*/
+
 		$moderatorId = Yii::app()->user->getId();
 		$moderationRule = null;
 		$content = ContentHelper::getContentForModeration($moderatorId);
@@ -140,4 +159,43 @@ class ModeratorController extends BaseProfileController {
 			)
 		);
 	}
+
+	protected function _checkIfModeratorCanModerate(ContentModel $content, ModeratorModel $moderator, $moderationRule = null) {
+		$errorMessage = '';
+
+		if (empty($moderationRule)) {
+			$level = 1;
+		} else {
+			$level = $moderationRule->level;
+		}
+
+		if ($level >= count($content->marks)) {
+			$errorMessage = 'because amount of marks for content reached the level of moderationRule ' . $level;
+		}
+
+		if (!in_array(mb_strtolower($content->lang), $moderator->langs)) {
+			$errorMessage = 'moderator cannot moderate content on the ' . $content->lang . ' language';
+		}
+
+		if (false) {
+			$errorMessage = 'because he/she have moderated this content previously';
+		}
+
+		if (empty($errorMessage)) {
+			return true;
+		} else {
+			$errorMessage = __METHOD__ . ' Moderator ' . $moderator->getId() . ' cant moderate content '
+				. $content->getId() . ' ' . $errorMessage;
+			Yii::log($errorMessage, CLogger::LEVEL_ERROR);
+			return false;
+		}
+	}
+
+//	protected function _getDefaultModerationRule() {
+//		$rule = new ModerationRuleModel();
+//		$rule->level = 1;
+//		$rule->text = '';
+//		$rule->name = '';
+//		return
+//	}
 }

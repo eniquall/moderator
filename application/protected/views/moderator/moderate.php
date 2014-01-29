@@ -12,11 +12,27 @@ if (empty($content)) {
 	}
 </style>
 
+
+<script>
+	$(document).ready(function(){
+		$('.approveButton').on('click', function () {
+			var approveResult = $(this).attr('data-approveResult');
+			$('#moderateForm_approveResult').val(approveResult);
+			$('#moderateForm').submit();
+		});
+	});
+
+</script>
+
+
+<form name="moderateForm" id="moderateForm" method="POST">
+	<?php echo CHtml::hiddenField('moderateForm[contentId]', $content->getId()); ?>
+	<?php echo CHtml::hiddenField('moderateForm[approveResult]', ''); ?>
+</form>
+
 <table class="moderationTable" cellspacing="2" border="1" cellpadding="5">
 <tr>
 	<td class="content">
-		Content:
-
 		<?php
 		foreach($content->data as $contentItem) {
 			echo "<div>";
@@ -30,7 +46,7 @@ if (empty($content)) {
 
 				case 'text':
 				default:
-					echo $contentItemValue;
+					echo "<div><b>text:</b> " . $contentItemValue . "</div>";
 				break;
 			}
 			echo "</div>";
@@ -38,8 +54,6 @@ if (empty($content)) {
 		?>
 	</td>
 	<td class="moderationRule">
-		Moderation rule:
-
 		<?php if (!empty($moderationRule)) {
 			echo $moderationRule->text;
 		} ?>
@@ -47,7 +61,6 @@ if (empty($content)) {
 </tr>
 <tr>
 	<td class="context">
-		Context:
 		<?php
 		foreach($content->context as $contentItem) {
 			$contentItemValue = reset($contentItem);
@@ -60,25 +73,28 @@ if (empty($content)) {
 
 				case 'text':
 				default:
-					echo $contentItemValue;
-					break;
+					echo "<div><b>text:</b> " . $contentItemValue . "</div>";
+				break;
 			}
 		}
 		?>
 	</td>
 	<td class="project">
-		ProjectName:
-
 		<?php
-		echo $project->name;
+			echo $project->name;
 		?>
 	</td>
 </tr>
 <tr>
-	<td class="approve"><?php $this->widget('bootstrap.widgets.TbButton', array(
+	<td class="approve">
+		<?php $this->widget('bootstrap.widgets.TbButton', array(
 			'label'=>'Approve',
 			'type'=>'success',
 			'size'=>'large',
+			'htmlOptions' => array(
+				'class' => 'approveButton',
+				'data-approveResult' => '1' //disapprove
+			),
 		)); ?>
 	</td>
 	<td class="disapprove">
@@ -86,11 +102,14 @@ if (empty($content)) {
 			'label'=>'Disapprove',
 			'type'=>'danger',
 			'size'=>'large',
+			'htmlOptions' => array(
+				'class' => 'approveButton',
+				'data-approveResult' => '0' //disapprove
+			),
 		)); ?>
 	</td>
 </tr>
 
 </table>
-
 
 <?php } ?>
