@@ -71,8 +71,7 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	<?php echo $form->label($model, 'paypal', array('label' => $model->getAttributeLabel("paypal"))); ?>
 	<?php echo $form->textField($model, 'paypal', array('class' => 'shortField')); ?>
 	<?php echo $form->error($model, 'paypal'); ?>
-<? } ?>
-
+<?php } ?>
 
 <div>
 	<?php $this->widget('bootstrap.widgets.TbButton',
@@ -82,4 +81,5 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 		)
 	); ?>
 </div>
-<?php $this->endWidget(); ?>
+
+<?php $this->endWidget();?>
