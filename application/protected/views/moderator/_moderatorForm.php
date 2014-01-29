@@ -34,13 +34,17 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	<?php echo $form->textArea($model, 'notes', array('class' => 'longField')); ?>
 	<?php echo $form->error($model, 'notes'); ?>
 
-	<?php echo $form->label($model, 'isActive', array('label' => $model->getAttributeLabel("isActive"))); ?>
-	<?php echo $form->checkbox($model, 'isActive', array('class' => 'shortField')); ?>
-	<?php echo $form->error($model, 'isActive'); ?>
+	<label class="checkbox">
+		<?php echo $form->label($model, 'isActive', array('label' => $model->getAttributeLabel("isActive"))); ?>
+		<?php echo $form->checkbox($model, 'isActive', array('class' => 'shortField')); ?>
+		<?php echo $form->error($model, 'isActive'); ?>
+	</label>
 
-	<?php echo $form->label($model, 'isSuperModerator', array('label' => $model->getAttributeLabel("isSuperModerator"))); ?>
-	<?php echo $form->checkbox($model, 'isSuperModerator', array('class' => 'shortField')); ?>
-	<?php echo $form->error($model, 'isSuperModerator'); ?>
+	<label class="checkbox">
+		<?php echo $form->label($model, 'isSuperModerator', array('label' => $model->getAttributeLabel("isSuperModerator"))); ?>
+		<?php echo $form->checkbox($model, 'isSuperModerator', array('class' => 'shortField')); ?>
+		<?php echo $form->error($model, 'isSuperModerator'); ?>
+	</label>
 
 <?php } ?>
 

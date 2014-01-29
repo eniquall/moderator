@@ -27,9 +27,11 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	<?php echo $form->textField($model, 'email', array('class' => 'shortField')); ?>
 	<?php echo $form->error($model, 'email'); ?>
 
-	<?php echo $form->label($model, 'isActive', array('label' => $model->getAttributeLabel("isActive"))); ?>
-	<?php echo $form->checkbox($model, 'isActive', array('class' => 'shortField')); ?>
-	<?php echo $form->error($model, 'isActive'); ?>
+	<label class="checkbox">
+		<?php echo $form->label($model, 'isActive', array('label' => $model->getAttributeLabel("isActive"))); ?>
+		<?php echo $form->checkbox($model, 'isActive', array('class' => 'shortField')); ?>
+		<?php echo $form->error($model, 'isActive'); ?>
+	</label>
 
 <?php if (Yii::app()->user->isAdmin()) {?>
 	<?php echo $form->label($model, 'notes', array('label' => $model->getAttributeLabel("notes"))); ?>
