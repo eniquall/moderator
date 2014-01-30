@@ -26,63 +26,11 @@ class RestController extends Controller{
 	},
 	{..}
 	 *
-	 *
-	 * http://moderator.local/api/?apiKey=12344567890&data={}
 	 * http://moderator.local/?r=rest/index/apiKey/4bfa4f88d767379953074aed37f140e4/data/{}
 	 */
-	public function actionIndex($apiKey, $data) {
-//		$data = <<<DATA
-//[{
-//"id": "123",
-//"projectId": "52d5db281e483cdb1d8b4567",
-//"type": "profile",
-//"lang": "ru",
-//"data": [
-//    {"img": "http://www.bacuseventos.es/portal/contenidos/images/tmp2/565/automotivo-wall-papers-show-som-e-laser-248533_20130725132548.jpg" },
-//    {"text": "show time!!!"}
-//],
-//"context": [
-//    {"text": "Amsterdam 2014"},
-//    {"text": "yeee-hooO!"}
-//]
-//}]
-//DATA;
-//		$data = <<<DATA
-//		[{
-//			"id": "123",
-//"projectId": "52d5db281e483cdb1d8b4567",
-//"type": "profile",
-//"lang": "ru",
-//"data": [
-//    {"img": "http://mutuamatheka.files.wordpress.com/2011/02/23_sun_dance_1600-1280.jpg" },
-//    {"text": "down!!!"}
-//],
-//"context": [
-//    {"text": "Bali 2015"},
-//    {"text": "the best vacation ever!!!111"}
-//]
-//}]
-//DATA;
-
-
-		$data = <<<DATA
-		[{
-			"id": "256",
-"projectId": "52d5dda01e483cdb1d8b4569",
-"type": "photoWithName",
-"lang": "ch",
-"data": [
-    {"img": "http://undergroundwebworld.com/Images%20Art/storm.jpg" },
-    {"text": "bad weather"}
-],
-"context": [
-    {"text": "Photo from album 'Nature'"},
-    {"text": "bgf"}
-]
-}]
-DATA;
-
-		//http://static.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/1/28/1359391807703/Light-Show-exhibition-at--010.jpg
+	public function actionIndex($apiKey) {
+		$data = Yii::app()->request->getParam('data');
+		// need to change to POST after testing
 
 		$project = $this->getProjectByApiKey($apiKey);
 
@@ -99,7 +47,7 @@ DATA;
 				$this->_addContent($contentByUser);
 			}
 		}
-		$moderatedContent = $this->_getModeratedContentByProject($project->_id);
+		$moderatedContent = $this->_getModeratedContentByProject($project->getId());
 		$this->_respond(200, 'ok', $moderatedContent);
 	}
 
@@ -110,7 +58,7 @@ DATA;
 	public function getProjectByApiKey($apiKey) {
 		$criteria = new EMongoCriteria();
 		$criteria->apiKey = $apiKey;
-		$criteria->isActive = '1';
+		$criteria->addCond('isActive', 'in', [1, '1']);
 		$project = ProjectModel::model()->find($criteria);
 
 		return $project;
@@ -134,14 +82,16 @@ DATA;
 			return false;
 			//$this->_generateError(500, 'Check your data request format. id, projectId, type, data are required, data - is an array');
 		}
+
+		$moderatorRule = ContentHelper::getModerationRuleByProjectIdAndTypeName($contentByUser['projectId'], $contentByUser['type']);
+		if (empty($moderatorRule)) {
+			Yii::log("Moderation rule was not found for content: " . CJSON::encode($contentByUser), CLogger::LEVEL_ERROR);
+		}
 		return true;
 	}
 
 	protected function _addContent($contentByUser) {
 		$contentModel = new ContentModel();
-//		foreach($contentByUser['data'] as $contentType => $contentValue) {
-//			$contentModel->
-//		}
 
 		$contentModel->data = $contentByUser['data'];
 		$contentModel->id = $contentByUser['id'];
@@ -155,41 +105,32 @@ DATA;
 		$contentModel->checkedDate = 0; // should be set as we will try to find content with cond: > time() - 3 * 60
 		// reason shouldn't be set here
 
-
-/*
-		public $_id;
-		public $uid;
-		public $projectId;
-		public $type;
-		public $lang;
-		public $data;
-		public $context;
-		public $reason;
-		public $isDelivered;
-		public $stat;
-		public $addedDate;
-		public $checkedDate;
-		public $reasonDate;
-
-● _id : mongoID
-● uid: string
-● project:string
-● type:string
-● lang:string
-● data: [ ]
-● context: [ ]
-● reason: bool  [0,1] ­ финальный результат голосования
-● delivery: bool [0,1] ­ флаг доставки результата модерирования клиенту
-● stat: [ ]  ­ перечень модераторов которые модерировали этот контент с их апрувами
-● adddate: timestamp  ­ дата добавления
-● checkdate: timestamp ­ дата поступления контента на модерацию к конкретному
-модератору
-● reasondate: timestamp  ­ дата вынесения апрува
-		*/
 		return $contentModel->save();
 	}
 
 	protected function _getModeratedContentByProject($projectId) {
-		return true;
+		$criteria = new EMongoCriteria();
+		$criteria->addCond('projectId', '==', $projectId);
+		$criteria->addCond('reason', 'in', [0,1]);
+
+		$content = ContentModel::model()->findAll($criteria);
+
+
+		$response = [];
+		foreach($content as $contentItem) {
+			$contentItemArray = [];
+			$contentItemArray['id'] = $contentItem->getId();
+			$contentItemArray['status'] = ((int) $contentItem->reason) ? 'allow' : 'disallow' ;
+
+			$yes = array_sum($contentItem->stat);
+			$no = count($contentItem->stat) - $yes;
+			$contentItemArray['stat'] = array(
+				'allow' => $yes,
+				'disallow' => $no
+			);
+			$response[] = $contentItemArray;
+		}
+
+		return $response;
 	}
 }

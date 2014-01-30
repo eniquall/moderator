@@ -37,7 +37,7 @@ class ContentHelper {
 		return $moderationRules;
 	}
 
-	public static function getModerationRuleByProjectAndTypeName($projectId, $ruleTypeName) {
+	public static function getModerationRuleByProjectIdAndTypeName($projectId, $ruleTypeName) {
 		$criteria = new EMongoCriteria();
 		$criteria->projectId = $projectId;
 		$criteria->type = new MongoRegex('/' . trim($ruleTypeName) . '/i');
@@ -65,22 +65,27 @@ class ContentHelper {
 		}
 
 		// content doesn't have final status
-		$criteria->addCond('reason', 'notexists', '');
-	//	$criteria->addCond('checkedDate', '<', time() - 3 * 60); // last check attempt was more than 3 minutes ago
-		$criteria->offset(20);
-		//according to task
+		$criteria->addCond('reason', 'notin', [0,1]); // YMDS set default value null for it somehow
+		$criteria->addCond('checkedDate', '<', time() - 3 * 60); // last check attempt was more than 3 minutes ago
 
-		$content = ContentModel::model()->find($criteria);
+		// stat array doesn't contains our moderatorId - content wasn't moderated by current moderator
+		$criteria->addCond('stat.' . $moderatorId, 'exists', false); // stat array doesn't contains our moderatorId
+		$criteria->limit(20);
+		//according to the task
+
+		$content = ContentModel::model()->findAll($criteria);
+
+
 		if (empty($content)) {
 			return null;
 		}
 
 		// get one item from array (sort them by projects)
 		if (count($content) > 1) {
-			// @TODO implement some filtration
+			// @TODO implement some filtration - if we really need it
 			$contentItem = reset($content);
 		} else {
-			$contentItem = $content;
+			$contentItem = reset($content);
 		}
 
 		// set check time - so other moderator will not take it at the same time

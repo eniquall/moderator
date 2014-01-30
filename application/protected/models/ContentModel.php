@@ -60,8 +60,9 @@ class ContentModel extends CPModel {
 			array('reason, isDelivered', 'numerical', 'integerOnly'=>true),
 			array('isDelivered', 'in', 'range' => [0,1]),
 			array('id', 'length', 'max'=>100),
-			array('type, stat', 'length', 'max'=>45),
+			array('type', 'length', 'max'=>45),
 			array('projectId', 'isProjectExists'),
+			array('stat', 'type', 'type'=>'array','allowEmpty'=>true),
 			array('lang', 'length', 'max'=>2),
 			array('checkedDate, reasonDate', 'safe'),
 			// The following rule is used by search().

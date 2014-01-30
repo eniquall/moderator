@@ -49,7 +49,7 @@ class ModerationRuleModel extends CPModel {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('projectId, type', 'required'),
+			array('projectId, text, type, level', 'required'),
 			array('projectId', 'length', 'is'=>24),
 			array('level', 'numerical', 'integerOnly'=>true),
 			array('level', 'Odd'),

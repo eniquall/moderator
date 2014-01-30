@@ -123,33 +123,45 @@ class ModeratorController extends BaseProfileController {
 	 * The main action for moderating content
 	 */
 	public function actionModerate() {
-		
-		/*
-		if (isset($_POST['moderateForm[contentId]'], $_POST['moderateForm[approveResult]'])) {
-			$contentId = $_POST['moderateForm[contentId]'];
-			$approveResult = $_POST['moderateForm[approveResult]'];
+		// approving
+		if (isset($_POST['moderateForm'], $_POST['moderateForm']['contentId'], $_POST['moderateForm']['approveResult'])) {
+			$contentId = $_POST['moderateForm']['contentId'];
+			$approveResult = (int) $_POST['moderateForm']['approveResult'];
 
 			$content = ContentModel::model()->findByPk(new MongoId($contentId));
 			if (empty($content)) {
 				Yii::log(__METHOD__ . ' Content with id ' . $contentId . 'was not found' , CLogger::LEVEL_ERROR);
-				$this->redirect('/moderator/moderate'); // redirect to page without POST params to avoid multi approve actions
+				$this->redirect(array('moderator/moderate')); // redirect to page without POST params to avoid multi approve actions
 			}
+
 			//check if moderator can work with this content
 			$moderator = Yii::app()->user->getModel();
-			$this->_checkIfModeratorCanModerate($content, $moderator);
+			$moderationRule = ContentHelper::getModerationRuleByProjectIdAndTypeName($content->projectId, $content->type);
 
-			// save mark ...
+			if (empty($moderationRule)) {
+				throw new CHttpException(500, __METHOD__ . 'Can\'t find moderation rule (contentId = ' . $contentId . ' type = ' . $content->type . ')' );
+			}
+
+			$canModerate = $this->_checkIfModeratorCanModerate($content, $moderator, $moderationRule);
+			if ($canModerate) {
+				$this->_saveApproveMark($content, $moderator, $moderationRule, $approveResult);
+			}
+
+			$this->redirect(array('moderator/moderate'));
 		}
-		*/
 
+		// get Next Content
 		$moderatorId = Yii::app()->user->getId();
-		$moderationRule = null;
+		$project = $moderationRule = null;
 		$content = ContentHelper::getContentForModeration($moderatorId);
 
 		if ($content) {
-			$moderationRule = ContentHelper::getModerationRuleByProjectAndTypeName($content->projectId, $content->type);
+			$moderationRule = ContentHelper::getModerationRuleByProjectIdAndTypeName($content->projectId, $content->type);
+			if (empty($moderationRule)) {
+				Yii::log(__METHOD__ . ' Moderation rule was not found for content ' . CJSON::encode($content->getAttributes()), CLogger::LEVEL_ERROR);
+			}
+			$project = ProjectModel::model()->findByPk(new MongoId($content->projectId));
 		}
-		$project = ProjectModel::model()->findByPk(new MongoId($content->projectId));
 
 		$this->render('moderate',
 			array(
@@ -160,24 +172,28 @@ class ModeratorController extends BaseProfileController {
 		);
 	}
 
-	protected function _checkIfModeratorCanModerate(ContentModel $content, ModeratorModel $moderator, $moderationRule = null) {
+	protected function _checkIfModeratorCanModerate(ContentModel $content, ModeratorModel $moderator, ModerationRuleModel $moderationRule) {
 		$errorMessage = '';
 
-		if (empty($moderationRule)) {
-			$level = 1;
-		} else {
-			$level = $moderationRule->level;
-		}
-
-		if ($level >= count($content->marks)) {
+		$level = $moderationRule->level;
+		if (count($content->stat) >= $level) {
 			$errorMessage = 'because amount of marks for content reached the level of moderationRule ' . $level;
 		}
 
-		if (!in_array(mb_strtolower($content->lang), $moderator->langs)) {
-			$errorMessage = 'moderator cannot moderate content on the ' . $content->lang . ' language';
+		if ($moderator->isSuperModerator != "1") {
+			$moderatorLangs = [];
+			$allowedLangsList = LanguagesHelper::getAllowedLanguagesList();
+			foreach($moderator->langs as $lang) {
+				$moderatorLangs[] = $allowedLangsList[$lang];
+			}
+
+			if (!in_array(mb_strtolower($content->lang), $moderatorLangs)) {
+				$errorMessage = 'moderator cannot moderate content on the ' . $content->lang . ' language';
+			}
 		}
 
-		if (false) {
+		$stat = array_keys((array)$content->stat); // array with statistics
+		if (in_array($moderator->getId(), $stat)) {
 			$errorMessage = 'because he/she have moderated this content previously';
 		}
 
@@ -191,11 +207,25 @@ class ModeratorController extends BaseProfileController {
 		}
 	}
 
-//	protected function _getDefaultModerationRule() {
-//		$rule = new ModerationRuleModel();
-//		$rule->level = 1;
-//		$rule->text = '';
-//		$rule->name = '';
-//		return
-//	}
+	protected function _saveApproveMark(ContentModel $content, ModeratorModel $moderator, ModerationRuleModel $moderationRule, $approveResult) {
+		$content->stat[$moderator->getId()] = $approveResult; // add statistics to content
+
+		if (count($content->stat) >= $moderationRule->level) {
+			// enough votes - calculate final result
+			$yesVotes = array_sum($content->stat);
+			$allVotes = count($content->stat);
+
+			if ($yesVotes > ($allVotes / 2)) {
+				// final result - yes
+				$content->reason = 1;
+			} else {
+				// final result - no
+				$content->reason = 0;
+			}
+			$content->reasonDate = time();
+		}
+		$result = $content->save();
+
+		return $result;
+	}
 }

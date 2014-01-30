@@ -23,7 +23,7 @@ class ModerationRuleForm extends CFormModel {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('projectId, type, level', 'required'),
+			array('projectId, type, level, text', 'required'),
 			array('projectId', 'length', 'is'=>24),
 
 			array('_id', 'required', 'on' => ModerationRuleForm::EDIT_RULE_SCENARIO),
