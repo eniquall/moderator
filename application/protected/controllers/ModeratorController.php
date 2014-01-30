@@ -173,6 +173,8 @@ class ModeratorController extends BaseProfileController {
 	}
 
 	protected function _checkIfModeratorCanModerate(ContentModel $content, ModeratorModel $moderator, ModerationRuleModel $moderationRule) {
+		Yii::beginProfile(__METHOD__);
+
 		$errorMessage = '';
 
 		$level = $moderationRule->level;
@@ -197,6 +199,7 @@ class ModeratorController extends BaseProfileController {
 			$errorMessage = 'because he/she have moderated this content previously';
 		}
 
+		Yii::endProfile(__METHOD__);
 		if (empty($errorMessage)) {
 			return true;
 		} else {

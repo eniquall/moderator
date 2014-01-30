@@ -91,6 +91,7 @@ class RestController extends Controller{
 	}
 
 	protected function _addContent($contentByUser) {
+		Yii::beginProfile(__METHOD__);
 		$contentModel = new ContentModel();
 
 		$contentModel->data = $contentByUser['data'];
@@ -105,7 +106,9 @@ class RestController extends Controller{
 		$contentModel->checkedDate = 0; // should be set as we will try to find content with cond: > time() - 3 * 60
 		// reason shouldn't be set here
 
-		return $contentModel->save();
+		$result = $contentModel->save();
+		Yii::endProfile(__METHOD__);
+		return $result;
 	}
 
 	protected function _getModeratedContentByProject($projectId) {

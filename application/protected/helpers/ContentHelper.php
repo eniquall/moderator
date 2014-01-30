@@ -47,6 +47,8 @@ class ContentHelper {
 	}
 
 	public static function getContentForModeration($moderatorId) {
+		Yii::beginProfile(__METHOD__ . "_" . $moderatorId);
+
 		$moderator = ModeratorModel::model()->findByPk(new MongoId($moderatorId));
 
 		$criteria = new EMongoCriteria();
@@ -92,6 +94,7 @@ class ContentHelper {
 		$contentItem->checkedDate = time();
 		$contentItem->save();
 
+		Yii::endProfile(__METHOD__ . "_" . $moderatorId);
 		return $contentItem;
 	}
 }
