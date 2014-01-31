@@ -22,6 +22,36 @@ abstract class BaseProfileController extends Controller {
 		$this->render('application.views.common.login', array('model' => $model));
 	}
 
+	public function actionStatistics() {
+		$modelId = Yii::app()->user->getId();
+
+		$curMonthStat = $prevMonthStat = null;
+		$beginningOfThePrevMonth = mktime(0, 0, 0, date("m", strtotime("-1 month")), 1, date("Y", strtotime("-1 month")));
+		$beginningOfTheCurMonth  = mktime(0, 0, 0, date("m", time()), 1, date("Y", strtotime("-1 month")));
+
+		$criteria = new EMongoCriteria();
+		if (Yii::app()->user->isModerator()) {
+			$criteria->addCond('stat.' . $modelId, 'exists', true);
+		} else if (Yii::app()->user->isProject()) {
+			$criteria->addCond('projectId', '==', $modelId);
+		}
+
+		$criteria->addCond('reasonDate', '>=' ,$beginningOfThePrevMonth);
+		$prevAndCurMonthStat = ContentModel::model()->count($criteria);
+
+		$criteria->cleanFieldConditions('reasonDate');
+		$criteria->addCond('reasonDate', '>=' ,$beginningOfTheCurMonth);
+
+		$curMonthStat = ContentModel::model()->count($criteria);
+
+		$prevMonthStat = $prevAndCurMonthStat - $curMonthStat;
+
+		$this->render('application.views.common.statistics', array(
+			'curMonthStat'  => $curMonthStat,
+			'prevMonthStat' => $prevMonthStat
+		));
+	}
+
 	/**
 	 * Logs out the current user and redirect to homepage.
 	 */

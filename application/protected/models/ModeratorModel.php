@@ -8,7 +8,7 @@ class ModeratorModel extends CPModel {
 	public $password;
 	
 	public $langs;
-	public $projectIds;
+	public $projects;
 	public $paypal;
 	
 	public $notes;
@@ -65,7 +65,7 @@ class ModeratorModel extends CPModel {
 			array('name, email, password, langs', 'required'),
 			array('email', 'uniqueEmail'),
 			array('isActive, isSuperModerator', 'in', 'range' => [0,1]),
-
+			array('projects', 'type', 'type'=>'array','allowEmpty'=>true),
 			array('langs','type','type'=>'array','allowEmpty' => false, 'message' => 'Choose at least one language from the list'),
 			array('langs', 'LanguageAllowed', 'message' => 'One of the languages is not allowed'),
 		);

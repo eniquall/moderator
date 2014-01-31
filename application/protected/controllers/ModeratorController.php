@@ -17,7 +17,7 @@ class ModeratorController extends BaseProfileController {
 	public function accessRules() {
 		return array(
 			array('deny',
-				'actions'=>array('EditProfile', 'Moderate'),
+				'actions'=>array('EditProfile', 'Moderate', 'Statistics', 'AddModerationRule', 'EditModerationRule'),
 				'users'=>array('?'),
 			),
 			array('deny',
@@ -25,7 +25,7 @@ class ModeratorController extends BaseProfileController {
 				'users'=>array('@'),
 			),
 			array('allow',
-				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule'),
+				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule', 'Statistics'),
 				'roles'=>array(UserIdentity::PROJECT_ROLE, UserIdentity::ADMIN_ROLE),
 			),
 		);
@@ -228,6 +228,19 @@ class ModeratorController extends BaseProfileController {
 			$content->reasonDate = time();
 		}
 		$result = $content->save();
+
+		//save statistics for moderator
+		if ($result) {
+			$projects = !empty($moderator->projects) ? $moderator->projects : [];
+			$countOfMarks = !empty($projects[$content->projectId]) ? $projects[$content->projectId] : 0;
+			$countOfMarks++;
+
+			$projects[$content->projectId] = $countOfMarks;
+			$moderator->projects = $projects;
+			$moderator->lastActivity = time();
+
+			$moderator->save();
+		}
 
 		return $result;
 	}

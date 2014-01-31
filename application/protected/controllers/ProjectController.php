@@ -17,11 +17,11 @@ class ProjectController extends BaseProfileController {
 	public function accessRules() {
 		return array(
 			array('deny',
-				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule', 'ShowModerationRulesList'),
+				'actions'=>array('EditProfile', 'AddModerationRule', 'EditModerationRule', 'ShowModerationRulesList', 'Statistics'),
 				'users'=>array('?'),
 			),
 			array('allow',
-				'actions'=>array('Registration', 'EditProfile', 'AddModerationRule', 'EditModerationRule'),
+				'actions'=>array('Registration', 'EditProfile', 'AddModerationRule', 'EditModerationRule', 'Statistics'),
 				'roles'=>array(UserIdentity::PROJECT_ROLE, UserIdentity::ADMIN_ROLE),
 			),
 		);

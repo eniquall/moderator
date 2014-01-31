@@ -77,15 +77,33 @@ class ContentHelper {
 
 		$content = ContentModel::model()->findAll($criteria);
 
-
 		if (empty($content)) {
 			return null;
 		}
 
 		// get one item from array (sort them by projects)
-		if (count($content) > 1) {
-			// @TODO implement some filtration - if we really need it
-			$contentItem = reset($content);
+		if (count($content) > 1 && !empty($moderator->projects)) {
+			$contentArray = [];
+			foreach($content as $contentItem) {
+				$contentArray[$contentItem->projectId] = $contentItem;
+			}
+
+			$projects = $moderator->projects;
+
+			$contentOfFamiliarProjects = array_intersect_key($contentArray, $projects);
+
+			if (empty($contentOfFamiliarProjects)) {
+				// moderator didn't moderaterd content of any of those project - we can
+				// not choose "familiar" project - get first
+				$contentItem = reset($content);
+			} else {
+				//choose the most familiar project
+				$familiarProjectsFromContentList = array_intersect_key($projects, $contentArray);
+				arsort($familiarProjectsFromContentList); // sort by amount of marks
+				reset($familiarProjectsFromContentList);
+
+				$contentItem = $contentOfFamiliarProjects[key($familiarProjectsFromContentList)];
+			}
 		} else {
 			$contentItem = reset($content);
 		}

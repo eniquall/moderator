@@ -14,27 +14,43 @@
 	'items'=>array(
 		array(
 			'class'=>'bootstrap.widgets.TbMenu',
+			'stacked' => true,
+
 			'items'=>array(
-				array('label'=>'Home', 'url'=>array('/static/welcome')),
-				array('label'=>'About', 'url'=>array('/static/about')),
+				//static
+				array('label'=>'Home', 'url'=>'#', 'items' => array(
+					array('label'=>'Home', 'url'=>array('/static/welcome')),
+					array('label'=>'About', 'url'=>array('/static/about')),
+				)),
 
 				// moderator
-				array('label'=>'Moderator registration', 'url'=>array('/moderator/registration'), 'visible'=>Yii::app()->user->isGuest),
-				array('label'=>'Login as moderator', 'url'=>array('/moderator/login'), 'visible'=>Yii::app()->user->isGuest),
-				array('label'=>'Moderate content', 'url'=>$this->createUrl('/moderator/moderate'), 'visible'=>Yii::app()->user->isModerator()),
-				array('label'=>'Edit moderator profile', 'url'=>$this->createUrl('/moderator/editProfile', array('id' => Yii::app()->user->getId())), 'visible'=>Yii::app()->user->isModerator()),
+				array('label'=>'Moderator', 'url'=>'#', 'items' => array(
+					array('label'=>'Moderator registration', 'url'=>array('/moderator/registration'), 'visible'=>Yii::app()->user->isGuest),
+					array('label'=>'Login as moderator', 'url'=>array('/moderator/login'), 'visible'=>Yii::app()->user->isGuest),
+					array('label'=>'Moderate content', 'url'=>$this->createUrl('/moderator/moderate'), 'visible'=>Yii::app()->user->isModerator()),
+					array('label'=>'Edit moderator profile', 'url'=>$this->createUrl('/moderator/editProfile', array('id' => Yii::app()->user->getId())), 'visible'=>Yii::app()->user->isModerator()),
+					array('label'=>'Statistics', 'url'=>array('/moderator/statistics'), 'visible'=>Yii::app()->user->isModerator()),
+					), 'visible' => (Yii::app()->user->isModerator() || Yii::app()->user->isGuest)
+				),
 
 				// project
-				array('label'=>'Project registration', 'url'=>array('/project/registration'), 'visible'=> (Yii::app()->user->isGuest || Yii::app()->user->isAdmin())),
-				array('label'=>'Login as project', 'url'=>array('/project/login'), 'visible'=>Yii::app()->user->isGuest),
-				array('label'=>'Edit project profile', 'url'=>$this->createUrl('/project/editProfile', array('id' => Yii::app()->user->getId())), 'visible'=>Yii::app()->user->isProject()),
-
-				array('label'=>'Add moderation rule', 'url' => array('/project/addModerationRule'), 'visible'=>Yii::app()->user->isProject()),
-				array('label'=>'Show moderation rules', 'url' => array('/project/showModerationRulesList'), 'visible'=>Yii::app()->user->isProject()),
+				array('label'=>'Project', 'url'=>'#', 'items' => array(
+					array('label'=>'Project registration', 'url'=>array('/project/registration'), 'visible'=> (Yii::app()->user->isGuest || Yii::app()->user->isAdmin())),
+					array('label'=>'Login as project', 'url'=>array('/project/login'), 'visible'=>Yii::app()->user->isGuest),
+					array('label'=>'Edit project profile', 'url'=>$this->createUrl('/project/editProfile', array('id' => Yii::app()->user->getId())), 'visible'=>Yii::app()->user->isProject()),
+					array('label'=>'Add moderation rule', 'url' => array('/project/addModerationRule'), 'visible'=>Yii::app()->user->isProject()),
+					array('label'=>'Show moderation rules', 'url' => array('/project/showModerationRulesList'), 'visible'=>Yii::app()->user->isProject()),
+					array('label'=>'Statistics', 'url'=>array('/moderator/statistics'), 'visible'=>Yii::app()->user->isProject()),
+					), 'visible'=> (Yii::app()->user->isGuest || Yii::app()->user->isAdmin() || Yii::app()->user->isProject())
+				),
 
 				// admin
-				array('label'=>'Show projects', 'url' => array('/admin/showProjectsList'), 'visible'=>Yii::app()->user->isAdmin()),
-				array('label'=>'Show moderators', 'url' => array('/admin/showModeratorsList'), 'visible'=>Yii::app()->user->isAdmin()),
+				array('label'=>'Admin', 'url'=>'#', 'items' => array(
+						array('label'=>'Show projects', 'url' => array('/admin/showProjectsList'), 'visible'=>Yii::app()->user->isAdmin()),
+						array('label'=>'Show moderators', 'url' => array('/admin/showModeratorsList'), 'visible'=>Yii::app()->user->isAdmin()),
+					),
+					'visible'=>Yii::app()->user->isAdmin()
+				),
 
 				array('label'=>'Logout (' . Yii::app()->user->name .')', 'url'=>array('/moderator/logout'), 'visible'=>!Yii::app()->user->isGuest)
 			),
