@@ -45,6 +45,12 @@ return array(
 	),
 	// application components
 	'components' => array(
+		'components'=>array(
+			'request'=>array(
+				'enableCsrfValidation'=>true,
+				'enableCookieValidation'=>true,
+			),
+		),
 		'bootstrap'=>array(
 			'class'=>'bootstrap.components.Bootstrap',
 		),

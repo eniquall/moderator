@@ -21,6 +21,9 @@ class ProjectForm extends BaseProfileForm {
 
 	public function rules() {
 		return array(
+			array('name, notes','filter','filter'=>array($obj=new CHtmlPurifier(),'purify')),
+			array('name, notes','filter','filter'=>'strip_tags'),
+
 			array('name, email', 'required'),
 			array('password', 'required', 'on' => self::REGISTRATION_SCENARIO),
 
@@ -42,7 +45,6 @@ class ProjectForm extends BaseProfileForm {
 			array('newPassword2', 'compare', 'compareAttribute' => 'newPassword', 'on' => self::EDIT_PROFILE_SCENARIO),
 			array('isActive', 'in', 'range' => [0,1]),
 
-			array('notes', 'length', 'max'=>1000),
 			array('balance', 'numerical', 'min' => 0, 'on' => self::EDIT_PROFILE_SCENARIO),
 		);
 	}

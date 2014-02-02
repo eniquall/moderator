@@ -23,6 +23,9 @@ class ModerationRuleForm extends CFormModel {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
+			array('text, type','filter','filter'=>array($obj=new CHtmlPurifier(),'purify')),
+			array('name, notes','filter','filter'=>'strip_tags'),
+
 			array('projectId, type, level, text', 'required'),
 			array('projectId', 'length', 'is'=>24),
 
@@ -36,6 +39,7 @@ class ModerationRuleForm extends CFormModel {
 			array('type', 'UniqueRule', 'You already have rule of this type'),
 			array('text', 'length', 'max'=>1000),
 			array('type', 'length', 'max'=>200),
+
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('_id, projectId, type, text, level', 'safe', 'on'=>'search'),

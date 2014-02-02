@@ -25,6 +25,9 @@ class ModeratorForm extends BaseProfileForm {
 
 	public function rules() {
 		return array(
+			array('name, notes','filter','filter'=>array($obj=new CHtmlPurifier(),'purify')),
+			array('name, notes','filter','filter'=>'strip_tags'),
+
 			array('name, email', 'required'),
 			array('paypal', 'length', 'max' => 150, 'on' => self::EDIT_PROFILE_SCENARIO),
 			array('password', 'required', 'on' => self::REGISTRATION_SCENARIO),
