@@ -28,6 +28,11 @@ class ProjectForm extends BaseProfileForm {
 			array('name', 'length', 'min' => 2),
 			array('email', 'email', 'allowEmpty' => false),
 			array('email', 'uniqueEmail', 'on' => self::REGISTRATION_SCENARIO),
+
+			array('email', 'length', 'max'=>100),
+			array('name', 'length', 'max'=>45),
+			array('notes', 'length', 'max'=>1000),
+
 			array('password', 'length', 'min' => 6),
 
 			array('password', 'checkForNewPassword', 'on' => self::EDIT_PROFILE_SCENARIO),
