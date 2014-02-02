@@ -15,4 +15,8 @@ class StaticController extends Controller {
 	public function actionAbout() {
 		$this->render('about');
 	}
+
+	public function actionApiInstruction() {
+		$this->render('instruction');
+	}
 }

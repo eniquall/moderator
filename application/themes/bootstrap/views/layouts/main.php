@@ -21,6 +21,7 @@
 				array('label'=>'Home', 'url'=>'#', 'items' => array(
 					array('label'=>'Home', 'url'=>array('/static/welcome')),
 					array('label'=>'About', 'url'=>array('/static/about')),
+					array('label'=>'Api instruction', 'url'=>array('/static/apiInstruction')),
 				)),
 
 				// moderator
