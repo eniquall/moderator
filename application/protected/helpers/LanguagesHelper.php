@@ -19,4 +19,10 @@ class LanguagesHelper {
 			self::GERMAN_LANG  => 'de'
 		];
 	}
+
+	public static function getLanguageNameById($id) {
+		$list = self::getAllowedLanguagesList();
+
+		return !empty($list[$id]) ? $list[$id] : '';
+	}
 } 

@@ -29,8 +29,10 @@ class RestController extends Controller{
 	 * http://moderator.local/?r=rest/index/apiKey/4bfa4f88d767379953074aed37f140e4/data/{}
 	 */
 	public function actionIndex($apiKey) {
-		$data = Yii::app()->request->getParam('data');
-		// need to change to POST after testing
+		$data = !empty($_POST['data']) ? $_POST['data'] : null;
+		if (empty($data)) {
+			$this->_generateError(500, 'Data parameter is empty');
+		}
 
 		$project = $this->getProjectByApiKey($apiKey);
 
@@ -86,6 +88,7 @@ class RestController extends Controller{
 		$moderatorRule = ContentHelper::getModerationRuleByProjectIdAndTypeName($contentByUser['projectId'], $contentByUser['type']);
 		if (empty($moderatorRule)) {
 			Yii::log("Moderation rule was not found for content: " . CJSON::encode($contentByUser), CLogger::LEVEL_ERROR);
+			return false;
 		}
 		return true;
 	}

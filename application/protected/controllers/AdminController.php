@@ -9,6 +9,24 @@ class AdminController extends BaseProfileController {
 		return UserIdentity::ADMIN_ROLE;
 	}
 
+	public function init() {
+		Yii::app()->user->loginUrl = $this->createUrl('/moderator/login');
+	}
+
+	public function accessRules() {
+		return array(
+			array('allow',
+				'actions'=>array('ShowModeratorsList', 'EditModeratorProfile', 'ShowProjectsList', 'EditProjectProfile'),
+				'roles'=>array(UserIdentity::ADMIN_ROLE),
+			),
+
+			array('deny',
+				'actions'=>array('ShowModeratorsList', 'EditModeratorProfile', 'ShowProjectsList', 'EditProjectProfile'),
+				'users'=>array('?'),
+			),
+		);
+	}
+
 	public function getAfterLoginUrl() {
 		return $this->createUrl('/admin/showProjectsList');
 	}
@@ -29,13 +47,5 @@ class AdminController extends BaseProfileController {
 
 	public function actionEditProjectProfile() {
 		$this->render('editProjectProfile');
-	}
-
-	public function actionShowModerationRulesList() {
-		$this->render('showProjectsList');
-	}
-
-	public function actionEditModerationRule() {
-		$this->render('editModerationRule');
 	}
 }
