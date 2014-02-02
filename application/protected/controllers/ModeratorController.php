@@ -35,7 +35,7 @@ class ModeratorController extends BaseProfileController {
 		if (Yii::app()->user->isAdmin()) {
 			return $this->createUrl('/admin/showModeratorsList');
 		}
-		return $this->createUrl('/static/about');
+		return $this->createUrl('/moderator/moderate');
 	}
 
 	public function actionRegistration() {

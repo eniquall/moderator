@@ -25,8 +25,8 @@
 
 				// moderator
 				array('label'=>'Moderator', 'url'=>'#', 'items' => array(
-					array('label'=>'Moderator registration', 'url'=>array('/moderator/registration'), 'visible'=>Yii::app()->user->isGuest),
 					array('label'=>'Login as moderator', 'url'=>array('/moderator/login'), 'visible'=>Yii::app()->user->isGuest),
+					array('label'=>'Moderator registration', 'url'=>array('/moderator/registration'), 'visible'=>Yii::app()->user->isGuest),
 					array('label'=>'Moderate content', 'url'=>$this->createUrl('/moderator/moderate'), 'visible'=>Yii::app()->user->isModerator()),
 					array('label'=>'Edit moderator profile', 'url'=>$this->createUrl('/moderator/editProfile', array('id' => Yii::app()->user->getId())), 'visible'=>Yii::app()->user->isModerator()),
 					array('label'=>'Statistics', 'url'=>array('/moderator/statistics'), 'visible'=>Yii::app()->user->isModerator()),
@@ -35,8 +35,8 @@
 
 				// project
 				array('label'=>'Project', 'url'=>'#', 'items' => array(
-					array('label'=>'Project registration', 'url'=>array('/project/registration'), 'visible'=> (Yii::app()->user->isGuest || Yii::app()->user->isAdmin())),
 					array('label'=>'Login as project', 'url'=>array('/project/login'), 'visible'=>Yii::app()->user->isGuest),
+					array('label'=>'Project registration', 'url'=>array('/project/registration'), 'visible'=> (Yii::app()->user->isGuest || Yii::app()->user->isAdmin())),
 					array('label'=>'Edit project profile', 'url'=>$this->createUrl('/project/editProfile', array('id' => Yii::app()->user->getId())), 'visible'=>Yii::app()->user->isProject()),
 					array('label'=>'Add moderation rule', 'url' => array('/project/addModerationRule'), 'visible'=>Yii::app()->user->isProject()),
 					array('label'=>'Show moderation rules', 'url' => array('/project/showModerationRulesList'), 'visible'=>Yii::app()->user->isProject()),
