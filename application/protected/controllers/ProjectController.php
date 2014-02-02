@@ -50,6 +50,8 @@ class ProjectController extends BaseProfileController {
 	public function actionEditProfile($id) {
 		$formModel = new ProjectForm(BaseProfileForm::EDIT_PROFILE_SCENARIO);
 		$this->_checkPermissionForEditProfile($id);
+		$this->_checkMongoIdParameter($id, 'id');
+
 		$project = ProjectModel::model()->findByPk(new MongoId($id));
 
 		if (empty($project)) {
@@ -104,11 +106,13 @@ class ProjectController extends BaseProfileController {
 			}
 		} else {
 			$moderationRuleId = Yii::app()->request->getParam('id');
+			$this->_checkMongoIdParameter($moderationRuleId, 'id');
 
-			if (empty($moderationRuleId)) {
-				$this->redirect($this->createUrl('/project/showModerationRulesList'));
-			}
 			$moderationRule = ModerationRuleModel::model()->findByPk(new MongoId($moderationRuleId));
+
+			if (empty($moderationRule)) {
+				throw new CHttpException(404, 'ModerationRule with id ' . $moderationRuleId . ' was not found');
+			}
 			$model->populateFromModel($moderationRule);
 		}
 

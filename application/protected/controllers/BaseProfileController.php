@@ -86,4 +86,10 @@ abstract class BaseProfileController extends Controller {
 
 		throw new CHttpException(403, "You are trying to edit profile, but do not have permissions");
 	}
+
+	protected function _checkMongoIdParameter($id, $name) {
+		if (!MongoHelper::isValidId($id)) {
+			throw new CHttpException(500, "Parameter $name is not valid");
+		}
+	}
 } 

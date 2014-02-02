@@ -57,8 +57,9 @@ class ModeratorController extends BaseProfileController {
 	 */
 	public function actionEditProfile($id) {
 		$formModel = new ModeratorForm(BaseProfileForm::EDIT_PROFILE_SCENARIO);
-
+		$this->_checkMongoIdParameter($id, 'id');
 		$this->_checkPermissionForEditProfile($id);
+
 		$moderator = ModeratorModel::model()->findByPk(new MongoId($id));
 
 		if (empty($moderator)) {
