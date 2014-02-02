@@ -64,6 +64,8 @@ class ModeratorModel extends CPModel {
 		return array(
 			array('name, email, password, langs', 'required'),
 			array('email', 'uniqueEmail'),
+			array('email', 'length', 'max'=>100),
+			array('name', 'length', 'max'=>45),
 			array('isActive, isSuperModerator', 'in', 'range' => [0,1]),
 			array('projects', 'type', 'type'=>'array','allowEmpty'=>true),
 			array('langs','type','type'=>'array','allowEmpty' => false, 'message' => 'Choose at least one language from the list'),
