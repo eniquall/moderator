@@ -14,7 +14,27 @@ class ProfileHelper {
 		$criteria->email = $email;
 
 		if (!$isNewDocument) {
-			$criteria->_id('!=', $_id);
+			$criteria->_id('!=', new MongoId($_id));
+		}
+
+		$class = new $className();
+		if ($class::model()->count($criteria)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public static function isNameUnique($className, $name, $isNewDocument = true, $_id = null) {
+		if (!$isNewDocument && is_null($_id)) {
+			throw new CException("_id of mongo doc should not be empty if it is not new doc");
+		}
+
+		$criteria = new EMongoCriteria();
+		$criteria->name = $name;
+
+		if (!$isNewDocument) {
+			$criteria->_id('!=', new MongoId($_id));
 		}
 
 		$class = new $className();

@@ -38,7 +38,7 @@ class ModeratorForm extends BaseProfileForm {
 			array('_id', 'required', 'on' => 'edit'),
 			array('name', 'length', 'min' => 2),
 			array('email', 'email', 'allowEmpty' => false),
-			array('email', 'uniqueEmail', 'on' => self::REGISTRATION_SCENARIO),
+			array('email', 'uniqueEmail'),
 			array('password', 'length', 'min' => 6),
 
 			array('password', 'checkForNewPassword', 'on' => self::EDIT_PROFILE_SCENARIO),
