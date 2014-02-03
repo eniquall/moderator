@@ -16,6 +16,8 @@ $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 <?php echo $form->errorSummary($model); ?>
 
 <?php if ($model->getScenario() == BaseProfileForm::EDIT_PROFILE_SCENARIO) {?>
+		<div><b>ApiKey:</b> <?php echo $project->apiKey; ?></div><br>
+
 		<?php echo $form->hiddenField($model, '_id'); ?>
 <?php } ?>
 
