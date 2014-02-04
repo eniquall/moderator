@@ -6,7 +6,7 @@
 class ContentModel extends CPModel {
 	public $_id;
 	public $id; // external contentId
-	public $project;
+	public $projectId;
 	public $type;
 	public $lang;
 	public $data;
@@ -56,18 +56,18 @@ class ContentModel extends CPModel {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id, project, type, lang, addedDate', 'required'),
+			array('id, projectId, type, lang, addedDate', 'required'),
 			array('reason, isDelivered', 'numerical', 'integerOnly'=>true),
 			array('isDelivered', 'in', 'range' => [0,1]),
 			array('id', 'length', 'max'=>100),
 			array('type', 'length', 'max'=>45),
-			array('project', 'isProjectExists'),
+			array('projectId', 'isProjectExists'),
 			array('stat', 'type', 'type'=>'array','allowEmpty'=>true),
 			array('lang', 'length', 'max'=>2),
 			array('checkedDate, reasonDate', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('_id, id, project, type, lang, data, context, reason, isDelivered, stat, addedDate, checkedDate, reasonDate', 'safe', 'on'=>'search'),
+			array('_id, id, projectId, type, lang, data, context, reason, isDelivered, stat, addedDate, checkedDate, reasonDate', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -79,7 +79,7 @@ class ContentModel extends CPModel {
 		return array(
 			'_id' => 'ID',
 			'id' => 'id',
-			'project' => 'Project',
+			'projectId' => 'Project Id',
 			'type' => 'Type',
 			'lang' => 'Lang',
 			'data' => 'Data',
@@ -94,11 +94,8 @@ class ContentModel extends CPModel {
 	}
 
 	public function isProjectExists ($attribute, $params) {
-		$project = $this->attributes[$attribute];
-
-		$criteria = new EMongoCriteria();
-		$criteria->name = new MongoRegex('/' . trim($project) . '/i');
-		$project = ProjectModel::model()->find($criteria);
+		$projectId = $this->attributes[$attribute];
+		$project = ProjectModel::model()->findByPk(new MongoId($projectId));
 
 		if (empty($project)) {
 			$this->addError($attribute, 'Project with id  ' . $projectId . ' doesn\'t exists');
