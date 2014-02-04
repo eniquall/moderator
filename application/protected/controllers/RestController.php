@@ -116,8 +116,8 @@ class RestController extends BaseRestController {
 		Yii::beginProfile(__METHOD__);
 		$criteria = new EMongoCriteria();
 		$criteria->addCond('projectId', '==', $projectId);
-//		$criteria->addCond('reason', 'in', [0,1]);
-//		$criteria->addCond('isDelivered', 'notin', [1,'1']);
+		$criteria->addCond('reason', 'in', [0,1]);
+		$criteria->addCond('isDelivered', 'notin', [1,'1']);
 
 		$content = ContentModel::model()->findAll($criteria);
 
