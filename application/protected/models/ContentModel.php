@@ -67,7 +67,7 @@ class ContentModel extends CPModel {
 			array('checkedDate, reasonDate', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('_id, id, project, projectId, type, lang, data, context, reason, isDelivered, stat, addedDate, checkedDate, reasonDate', 'safe', 'on'=>'search'),
+			array('_id, id, projectId, type, lang, data, context, reason, isDelivered, stat, addedDate, checkedDate, reasonDate', 'safe', 'on'=>'search'),
 		);
 	}
 
