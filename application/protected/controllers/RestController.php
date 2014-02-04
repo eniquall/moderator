@@ -96,7 +96,7 @@ class RestController extends BaseRestController {
 
         $contentModel->data = $contentByUser['data'];
         $contentModel->id = $contentByUser['id'];
-        $contentModel->projectId = $$project->projectId;
+        $contentModel->projectId = $project->projectId;
         $contentModel->type = $contentByUser['type']; // check type ?
         $contentModel->lang = mb_strtolower($contentByUser['lang']); // check
         $contentModel->context = $contentByUser['context']; // check
