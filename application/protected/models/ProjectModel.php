@@ -59,6 +59,8 @@ class ProjectModel extends CPModel {
 			array('isActive', 'in', 'range' => [0,1]),
 			array('apiKey, password', 'length', 'is'=>32, 'on' => BaseProfileForm::EDIT_PROFILE_SCENARIO),
 			array('email', 'uniqueEmail'),
+			array('name', 'uniqueName'),
+
 			array('email', 'length', 'max'=>100),
 			array('name', 'length', 'max'=>45),
 			array('notes', 'length', 'max'=>1000),

@@ -69,7 +69,7 @@ class ProjectController extends BaseProfileController {
 			$formModel->populateFromModel($project);
 		}
 
-		$this->render('editProfile', array('model' => $formModel));
+		$this->render('editProfile', array('model' => $formModel, 'project' => $project));
 	}
 
 	public function actionAddModerationRule() {

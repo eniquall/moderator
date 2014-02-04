@@ -13,7 +13,7 @@ foreach($moderators as $moderator) {
 			break;
 
 			case 'password':
-				continue;
+				continue 2;
 			break;
 
 			case 'projects':

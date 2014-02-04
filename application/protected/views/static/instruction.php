@@ -1,13 +1,13 @@
-http://moderator.local/?r=rest/index/apiKey/4bfa4f88d767379953074aed37f140e4/
+http://moderator.local/?r=rest/index/apiKey/4bfa4f88d767379953074aed37f140e4/data/{}
 <br>
 POST
 <br><br>
-data parameter example:
+<b>data</b> parameter example:
 <br><br>
 
 [{<br>
 "id": "256",<br>
-"projectId": "52d5dda01e483cdb1d8b4569",<br>
+"project": "facebook.com",<br>
 "type": "photoWithName",<br>
 "lang": "ch",<br>
 "data": [<br>

@@ -1,42 +1,20 @@
-<?
+<?php
 
-/*
- *  HOW TO USE 
- * 
- * // configure profiler
- * // set  profiler server:port  and  set source for timers 
- * PRFLR::init(192.168.1.45-testApp', 'yourApiKey');
- * 
- * 
- * //start timer
- * PRFLR::Begin('mongoDB.save');
- * 
- * //some code
- * sleep(1);
- * 
- * //stop timer
- * PRFLR::End('mongoDB.save');
- * 
- */
-
-class PRFLR {
-
+class PRFLR
+{
     private static $sender;
 
     public static function init($source, $apikey) {
         self::$sender = new PRFLRSender();
 
-        if (!self::$sender->apikey = $apikey)
+        if (!self::$sender->apikey = substr($apikey, 0, 32))
             throw new Exception('Unknown apikey.');
 
         if (!self::$sender->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP))
             throw new Exception('Can\'t open socket.');
 
-        if (!$source)
-            self::$sender->source = isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'Unknown';
-        else
-            self::$sender->source = $source;
-        self::$sender->thread = uniqid();
+        self::$sender->source = substr($source, 0, 32);
+        self::$sender->thread = getmypid().".".uniqid(); //becouse no threads in PHP
     }
 
     public static function begin($timer) {
@@ -50,11 +28,10 @@ class PRFLR {
     public function __destruct() {
         unset(self::$sender);
     }
-
 }
 
-class PRFLRSender {
-
+class PRFLRSender
+{
     private $timers;
     public $socket;
     public $delayedSend = false;
@@ -93,13 +70,12 @@ class PRFLRSender {
         // format the message
         $message = join(array(
             substr($this->thread, 0, 32),
-            substr($this->source, 0, 32),
+            $this->source,
             substr($timer, 0, 48),
             $time,
             substr($info, 0, 32),
-            substr($this->apikey, 0, 32),
-
-                ), '|');
+            $this->apikey,
+        ), '|');
 
         if ($this->socket) {
             socket_sendto($this->socket, $message, strlen($message), 0, $this->ip, $this->port);
@@ -107,5 +83,4 @@ class PRFLRSender {
             throw new Exception("Socket not exist\n");
         }
     }
-
 }

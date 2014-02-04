@@ -5,56 +5,43 @@
  * Time: 1:58 AM
  */
 
-class RestController extends Controller{
-	// main action of the rest interface - adds new content and returns info about moderated content by project
+class RestController extends BaseRestController {
 	/**
-	 * @param $apiKey
-	 * @param $data - is JSON object in format
-	 * {
-		id: “1234567890”,   ­ уникальный идентификатор контента,  произвольный набор символов до 128знаков
-		“projectId” : “123342”,   ­ идентификатор проекта 24 hex of the mondoId object
-		type: “profile”,  ­ тип контента
-		lang: “ru”,   ­ язык (опционально)
-		data: [   ­ содержимое. Произвольный набор строк с указанием типа  text, img, audio, video,
-			 {“img”: url },
-			 {“text”: “я стою на утесе и машу писей ветру!!!”}
-		],
-		context: [	­ контекст в котором создан или показан контент, произвольный набор строк
-			  {“text”: “Василий,25”},
-			  {“text”: “12 жалоб”}
-		]
-	},
-	{..}
+	 * The main action of the rest interface - adds new content and returns info about moderated content by project
+	/* See /?r=static/apiInstruction page for details
 	 *
-	 * http://moderator.local/?r=rest/index/apiKey/4bfa4f88d767379953074aed37f140e4/data/{}
+	 * @param $apiKey
+	 * @param $data - is JSON object
 	 */
 	public function actionIndex($apiKey) {
 		$data = !empty($_POST['data']) ? $_POST['data'] : null;
-		if (empty($data)) {
-			$this->_generateError(500, 'Data parameter is empty');
-		}
 
 		$project = $this->getProjectByApiKey($apiKey);
 
 		if (empty($project)) {
-			$this->_generateError(403, 'Project with this apiKey (' . $apiKey . ') was not found. Project doesn\'t exist or inactive');
+			$this->_respondError(403, self::ERROR_PROJECT_NOT_FOUND_BY_KEY, $apiKey);
 		}
 
-		$decodedData = CJSON::decode($data);
-
-		foreach($decodedData as $contentByUser) {
-			// check content json format by each user
-			if ($this->_checkData($contentByUser)) {
-				//if everything ok - add it into storage
-				$this->_addContent($contentByUser);
+		if (!empty($data)) {
+			$decodedData = CJSON::decode($data);
+			foreach($decodedData as $contentByUser) {
+				// check content json format by each user
+				if ($this->_checkData($contentByUser, $project, $apiKey)) {
+					//if everything ok - add it into storage
+					$this->_addContent($contentByUser, $project);
+				}
 			}
 		}
-		$moderatedContent = $this->_getModeratedContentByProject($project->getId());
-		$this->_respond(200, 'ok', $moderatedContent);
-	}
 
-	protected function _respond($code, $status, $moderatedContent) {
-		echo CJSON::encode($moderatedContent);
+		// send errors information or moderated content
+		if ($this->hasErrors()) {
+			$status = 500;
+			$responseBody = $this->_prepeareErrorData();
+		} else if (empty($responseBody)) {
+			$status = 200;
+			$responseBody = $this->_prepeareResponseBody($project->getId());
+		}
+		$this->_respond($status, $responseBody);
 	}
 
 	public function getProjectByApiKey($apiKey) {
@@ -66,40 +53,43 @@ class RestController extends Controller{
 		return $project;
 	}
 
-	protected function _generateError($httpErrorCode, $message) {
-		throw new CHttpException($httpErrorCode, $message);
-		//$this->_respond();
-	}
-
-	protected function _checkData($contentByUser) {
+	protected function _checkData($contentByUser, $project, $apiKey) {
 
 		if ( !is_array($contentByUser) ||
 			empty($contentByUser['id']) ||
-			empty($contentByUser['projectId']) ||
+			empty($contentByUser['project']) ||
 			empty($contentByUser['type']) ||
 			empty($contentByUser['data']) ||
 			!is_array($contentByUser['data'])) {
-			Yii::log("Invalide format of user content: " . CJSON::encode($contentByUser)
-				. ' Check your data request format. id, projectId, type, data are required, data - is an array', CLogger::LEVEL_ERROR);
+
+			$this->_addError(self::ERROR_INVALID_CONTENT_DATA_FORMAT, ['id' => $contentByUser['id']]);
 			return false;
-			//$this->_generateError(500, 'Check your data request format. id, projectId, type, data are required, data - is an array');
 		}
 
-		$moderatorRule = ContentHelper::getModerationRuleByProjectIdAndTypeName($contentByUser['projectId'], $contentByUser['type']);
+		// check uniqueContentId
+		if (ContentModel::model()->findByAttributes(['id' => $contentByUser['id']])) {
+			$this->_addError(self::ERROR_DUPLICATED_CONTENT_ID, ['content' => $contentByUser]);
+		}
+
+		if (mb_strtolower($project->name) !== mb_strtolower($contentByUser['project'])) {
+			$this->_addError(self::ERROR_APIKEY_DOESNT_BELONGS_TO_PROJECT, ['id' => $apiKey, 'project' => $contentByUser['project']]);
+		}
+
+		$moderatorRule = ContentHelper::getModerationRuleByProjectNameAndTypeName($contentByUser['project'], $contentByUser['type']);
 		if (empty($moderatorRule)) {
-			Yii::log("Moderation rule was not found for content: " . CJSON::encode($contentByUser), CLogger::LEVEL_ERROR);
+			$this->_addError(self::ERROR_MODERATION_RULE_NOT_FOUND, $contentByUser);
 			return false;
 		}
 		return true;
 	}
 
-	protected function _addContent($contentByUser) {
+	protected function _addContent($contentByUser, $project) {
 		Yii::beginProfile(__METHOD__);
 		$contentModel = new ContentModel();
 
 		$contentModel->data = $contentByUser['data'];
 		$contentModel->id = $contentByUser['id'];
-		$contentModel->projectId = $contentByUser['projectId'];
+		$contentModel->projectId = $$project->projectId;
 		$contentModel->type = $contentByUser['type']; // check type ?
 		$contentModel->lang = mb_strtolower($contentByUser['lang']); // check
 		$contentModel->context = $contentByUser['context']; // check
@@ -114,10 +104,12 @@ class RestController extends Controller{
 		return $result;
 	}
 
-	protected function _getModeratedContentByProject($projectId) {
+	protected function _getModeratedContentByProjectForResponse($projectId) {
+		Yii::beginProfile(__METHOD__);
 		$criteria = new EMongoCriteria();
 		$criteria->addCond('projectId', '==', $projectId);
 		$criteria->addCond('reason', 'in', [0,1]);
+		$criteria->addCond('isDelivered', 'notin', [1,'1']);
 
 		$content = ContentModel::model()->findAll($criteria);
 
@@ -137,6 +129,22 @@ class RestController extends Controller{
 			$response[] = $contentItemArray;
 		}
 
+		ContentModel::model()->updateAll(
+			new EMongoModifier(
+				[
+					'isDelivered' => ['set' => 1]
+				]
+			),
+			$criteria
+		);
+
+		Yii::endProfile(__METHOD__);
 		return $response;
+	}
+
+	protected function _prepeareResponseBody($projectId) {
+		$moderatedContent = $this->_getModeratedContentByProjectForResponse($projectId);
+
+		return CJSON::encode($moderatedContent);
 	}
 }
