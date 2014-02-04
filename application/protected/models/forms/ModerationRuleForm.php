@@ -24,7 +24,7 @@ class ModerationRuleForm extends CFormModel {
 		// will receive user inputs.
 		return array(
 			array('text, type','filter','filter'=>array($obj=new CHtmlPurifier(),'purify')),
-			array('name, notes','filter','filter'=>'strip_tags'),
+			array('type, text','filter','filter'=>'strip_tags'),
 
 			array('projectId, type, level, text', 'required'),
 			array('projectId', 'length', 'is'=>24),
