@@ -11,7 +11,7 @@ class ProfileHelper {
 		}
 
 		$criteria = new EMongoCriteria();
-		$criteria->email = $email;
+		$criteria->email = new MongoRegex('/' . trim($email) . '/i');
 
 		if (!$isNewDocument) {
 			$criteria->_id('!=', new MongoId($_id));
@@ -31,7 +31,7 @@ class ProfileHelper {
 		}
 
 		$criteria = new EMongoCriteria();
-		$criteria->name = $name;
+		$criteria->name = new MongoRegex('/' . trim($name) . '/i');
 
 		if (!$isNewDocument) {
 			$criteria->_id('!=', new MongoId($_id));
