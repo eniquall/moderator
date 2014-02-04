@@ -32,9 +32,9 @@ class ModeratorController extends BaseProfileController {
 	}
 
 	public function getAfterLoginUrl(){
-		if (Yii::app()->user->isAdmin()) {
-			return $this->createUrl('/admin/showModeratorsList');
-		}
+//		if (Yii::app()->user->isAdmin()) {
+//			return $this->createUrl('/admin/showModeratorsList');
+//		}
 		return $this->createUrl('/moderator/moderate');
 	}
 
