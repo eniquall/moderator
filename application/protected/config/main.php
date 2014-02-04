@@ -23,6 +23,7 @@ return array(
 	'import' => array(
 		'application.components.*',
 		'application.controllers.BaseProfileController',
+        'application.controllers.BaseRestController',
 		'application.models.forms.*',
 		'application.models.*',
 		'application.helpers.*',
@@ -61,11 +62,11 @@ return array(
 		),
 		// uncomment the following to enable URLs in path-format
 		'urlManager' => array(
-//			'urlFormat' => 'path',
+			'urlFormat' => 'path', // following rules do not work if this is Commented!..
 			'rules' => array(
 				'' => 'static/welcome',
-				'/api' => 'rest/index'
-			),
+                '/api' => 'rest/index',
+            ),
 			'showScriptName' => false,
 		),
 		'mongodb' => array(
@@ -91,13 +92,24 @@ return array(
 					'class' => 'application.extensions.PRFLR.PRFLRLogRoute',
 					'enabled' => true,
 					'levels'  => 'profile',
-							'source' => 'moderator',
-								'apikey' => '234fgrtnsdfk45309s5',
-								//'email'  => 'info@moderator.com',
-								//'pass'   => '1234567890'
+                    'source' => 'moderator',
+                    'apikey' => '234fgrtnsdfk45309s5',
+                    //'email'  => 'info@moderator.com',
+                    //'pass'   => '1234567890'
 				),
 				//array('class' => 'CWebLogRoute'),
-				array('class' => 'CFileLogRoute')
+                array(
+                    'class'   => 'CFileLogRoute',
+                    'levels'  => 'info, trace',
+                    'logFile' => 'debug.log',
+                    'categories' => 'RestController.*'
+                ),
+                array(
+                    'class'   => 'CFileLogRoute',
+                    'levels'  => 'error, warning',
+                    'logFile' => 'error.log',
+                    //'categories' => 'RestController.*'
+                ),
 			),
 		),
 	),

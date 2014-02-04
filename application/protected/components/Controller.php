@@ -32,4 +32,9 @@ class Controller extends CController
 		parent::afterAction($action);
 		Yii::endProfile(get_class($this) . '_' . $this->getAction()->getId());
 	}
+
+    public function getActionParams()
+    {
+        return $_GET + $_POST;
+    }
 }

@@ -8,25 +8,30 @@
 class RestController extends BaseRestController {
 	/**
 	 * The main action of the rest interface - adds new content and returns info about moderated content by project
-	/* See /?r=static/apiInstruction page for details
+	* /* See /?r=static/apiInstruction page for details
 	 *
-	 * @param $apiKey
+	 * @param $apikey
 	 * @param $data - is JSON object
 	 */
-	public function actionIndex($apiKey) {
+	public function actionIndex($apikey) {
 		$data = !empty($_POST['data']) ? $_POST['data'] : null;
 
-		$project = $this->getProjectByApiKey($apiKey);
+        Yii::log('API Request from ' . $apikey, CLogger::LEVEL_TRACE, 'RestController.API');
+
+		$project = $this->getProjectByApiKey($apikey);
 
 		if (empty($project)) {
-			$this->_respondError(403, self::ERROR_PROJECT_NOT_FOUND_BY_KEY, $apiKey);
+            Yii::log("ApiKey {$apikey} is not found!", CLogger::LEVEL_ERROR, 'RestController.API');
+			$this->_respondError(403, self::ERROR_PROJECT_NOT_FOUND_BY_KEY, $apikey);
 		}
 
 		if (!empty($data)) {
+            //Yii::log('Receiving raw data: ' . $data, CLogger::LEVEL_TRACE, 'RestController.API');
 			$decodedData = CJSON::decode($data);
+            //Yii::log('Receiving decoded data: ' . print_r($decodedData, true), CLogger::LEVEL_TRACE, 'RestController.API');
 			foreach($decodedData as $contentByUser) {
 				// check content json format by each user
-				if ($this->_checkData($contentByUser, $project, $apiKey)) {
+				if ($this->_checkData($contentByUser, $project, $apikey)) {
 					//if everything ok - add it into storage
 					$this->_addContent($contentByUser);
 				}
@@ -39,7 +44,7 @@ class RestController extends BaseRestController {
 			$responseBody = $this->_prepeareErrorData();
 		} else if (empty($responseBody)) {
 			$status = 200;
-			$responseBody = $this->_prepeareResponseBody($project->getId());
+			$responseBody = $this->_prepareResponseBody($project->getId());
 		}
 		$this->_respond($status, $responseBody);
 	}
@@ -54,7 +59,7 @@ class RestController extends BaseRestController {
 	}
 
 	protected function _checkData($contentByUser, $project, $apiKey) {
-
+        Yii::log('Checking data: ' . print_r($contentByUser, true), CLogger::LEVEL_TRACE, 'RestController._checkData');
 		if ( !is_array($contentByUser) ||
 			empty($contentByUser['id']) ||
 			empty($contentByUser['project']) ||
@@ -62,21 +67,25 @@ class RestController extends BaseRestController {
 			empty($contentByUser['data']) ||
 			!is_array($contentByUser['data'])) {
 
+            Yii::log("Content is not well formatted: " . print_r($contentByUser, true), CLogger::LEVEL_ERROR, 'RestController._checkData');
 			$this->_addError(self::ERROR_INVALID_CONTENT_DATA_FORMAT, ['id' => $contentByUser['id']]);
 			return false;
 		}
 
 		// check uniqueContentId
 		if (ContentModel::model()->findByAttributes(['id' => $contentByUser['id']])) {
+            Yii::log("Content with such ID already exists: " . print_r($contentByUser, true), CLogger::LEVEL_ERROR, 'RestController._checkData');
 			$this->_addError(self::ERROR_DUPLICATED_CONTENT_ID, ['content' => $contentByUser]);
 		}
 
 		if (mb_strtolower($project->name) !== mb_strtolower($contentByUser['project'])) {
+            Yii::log("ApiKey mismatched: {$project->name} " . print_r($contentByUser, true), CLogger::LEVEL_ERROR, 'RestController._checkData');
 			$this->_addError(self::ERROR_APIKEY_DOESNT_BELONGS_TO_PROJECT, ['id' => $apiKey, 'project' => $contentByUser['project']]);
 		}
 
 		$moderatorRule = ContentHelper::getModerationRuleByProjectNameAndTypeName($contentByUser['project'], $contentByUser['type']);
 		if (empty($moderatorRule)) {
+            Yii::log("No Moderation Rule is provided for this Content: " . print_r($contentByUser, true), CLogger::LEVEL_ERROR, 'RestController._checkData');
 			$this->_addError(self::ERROR_MODERATION_RULE_NOT_FOUND, $contentByUser);
 			return false;
 		}
@@ -84,6 +93,8 @@ class RestController extends BaseRestController {
 	}
 
 	protected function _addContent($contentByUser) {
+        Yii::log('Adding Content: ' . print_r($contentByUser, true), CLogger::LEVEL_TRACE, 'RestController._addContent');
+
 		Yii::beginProfile(__METHOD__);
 		$contentModel = new ContentModel();
 
@@ -99,8 +110,14 @@ class RestController extends BaseRestController {
 		$contentModel->checkedDate = 0; // should be set as we will try to find content with cond: > time() - 3 * 60
 		// reason shouldn't be set here
 
-		$result = $contentModel->save();
+        $result = null;
+        try {
+		    $result = $contentModel->save();
+        } catch (Exception $e) {
+            Yii::log('Error while Adding Content: ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'RestController._addContent');
+        }
 		Yii::endProfile(__METHOD__);
+
 		return $result;
 	}
 
@@ -142,8 +159,10 @@ class RestController extends BaseRestController {
 		return $response;
 	}
 
-	protected function _prepeareResponseBody($projectId) {
+	protected function _prepareResponseBody($projectId) {
 		$moderatedContent = $this->_getModeratedContentByProjectForResponse($projectId);
+
+        Yii::log('Preparing Response Body for ' . $projectId . ', count: ' . count($moderatedContent), CLogger::LEVEL_TRACE, 'RestController._prepareResponseBody');
 
 		return CJSON::encode($moderatedContent);
 	}
