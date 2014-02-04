@@ -37,16 +37,9 @@ class ContentHelper {
 		return $moderationRules;
 	}
 
-	public static function getModerationRuleByProjectNameAndTypeName($projectName, $ruleTypeName) {
+	public static function getModerationRuleByProjectIdAndTypeName($projectId, $ruleTypeName) {
 		$criteria = new EMongoCriteria();
-		$criteria->name = new MongoRegex('/' . trim($projectName) . '/i');
-		$project = ProjectModel::model()->find($criteria);
-		if (empty($project)) {
-			return null;
-		}
-
-		$criteria = new EMongoCriteria();
-		$criteria->projectId = $project->getId();
+		$criteria->projectId = $projectId;
 		$criteria->type = new MongoRegex('/' . trim($ruleTypeName) . '/i');
 		$rule = ModerationRuleModel::model()->find($criteria);
 
