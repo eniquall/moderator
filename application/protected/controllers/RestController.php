@@ -99,9 +99,11 @@ class RestController extends BaseRestController {
 		$contentModel->id = $contentByUser['id'];
 		$contentModel->projectId = $project->getId();
 		$contentModel->type = $contentByUser['type']; // check type ?
-		$contentModel->lang = mb_strtolower($contentByUser['lang']); // check
+
+		if (!empty($contentByUser['lang'])) {
+			$contentModel->lang = mb_strtolower($contentByUser['lang']); // check
+		}
 		$contentModel->context = $contentByUser['context']; // check
-		$contentModel->lang = $contentByUser['lang']; // check
 		$contentModel->isDelivered = 0; // check
 		$contentModel->addedDate = time(); // check
 		$contentModel->checkedDate = 0; // should be set as we will try to find content with cond: > time() - 3 * 60
